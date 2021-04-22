@@ -1,15 +1,49 @@
 {% extends 'layout/main.html' %}
 
+
 {% block header %}
-  <h1>{% block title %}Log In{% endblock %}</h1>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
 
 {% block content %}
-  <form method="post">
-    <label for="username">Username</label>
-    <input name="username" id="username" required>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
-    <input type="submit" value="Log In">
-  </form>
+    <ul class="tab tab-block">
+        <li class="tab-item active">
+            <a href="#registo" data-tab="registo">Registo</a>
+        </li>
+        <li class="tab-item">
+            <a href="#login" data-tab="login">Login</a>
+        </li>
+    </ul>
+
+    <div id="registo" class="tab-content">
+
+        <form id="form-registo">
+            <div class="form-group">
+                <label class="form-label" for="input-example-1">Username</label>
+                <input class="form-input" type="text" id="input-registo-username" placeholder="Name">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="input-example-3">Password</label>
+                <input class="form-input" type="password" id="input-registo-password" placeholder="Password">
+            </div>
+            <button type="button" class="btn">Registar</button>
+        </form>
+
+    </div>
+    <div id="login" style="display:none" class="tab-content">
+
+        <form id="form-login">
+            <div class="form-group">
+                <label class="form-label" for="input-login-password">Username</label>
+                <input class="form-input" type="text" id="input-login-username" placeholder="Name">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="input-login-password">Password</label>
+                <input class="form-input" type="password" id="input-login-password" placeholder="Password">
+            </div>
+            <button type="button"  class="btn">Login</button>
+        </form>
+
+    </div>
 {% endblock %}

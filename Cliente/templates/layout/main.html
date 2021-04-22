@@ -1,10 +1,23 @@
 <!doctype html>
 <title>{% block title %}{% endblock %}</title>
-<!-- <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/spectre.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/spectre-exp.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/spectre-icons.min.css') }}">
+<script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
 
 <section class="content">
   <header>
     {% block header %}{% endblock %}
   </header>
-  {% block content %}{% endblock %}
+      <div class="container">
+        <div class="columns">
+            <div class="column col-3"></div>
+            <div class="column col-6">
+  {% block content %}
+
+  {% endblock %}
+            </div>
+            <div class="column col-3"></div>
+        </div>
+      </div>
 </section>

@@ -9,7 +9,7 @@ app.config["SECRET_KEY"] = secrets.token_urlsafe(16)
 
 @app.route('/')
 def main():
-    #response = requests.get("http://149.90.108.93:5000/hello")
+    #response = requests.get("http://149.90.108.93:80")
     SessionHelper.start_session(app)
     return render_template('index.html')
 
