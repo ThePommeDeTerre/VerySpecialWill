@@ -25,13 +25,14 @@ const IndexHelper = function () {
     //Inicializa o formulário, botões e ações
     const initForm = () => {
         $('#btn-login').on('click', login);
-        $('#btn-registo').on('click', login);
+        $('#btn-registo').on('click', registo);
     }
 
     const login = function () {
         const user = $('#input-login-username').val();
         const pass = $('#input-login-password').val();
 
+        //Verifica se os campos estao a vazio
         if (isEmpty(user) || isEmpty(pass)) {
             return alert('Por favor preencha todos os campos');
         }
@@ -56,9 +57,38 @@ const IndexHelper = function () {
 
             }
         )
-
     }
 
+    const registo = function () {
+        const user = $('#input-registo-username').val();
+        const pass = $('#input-registo-password').val();
+
+        //Verifica se os campos estao a vazio
+        if (isEmpty(user) || isEmpty(pass)) {
+            return alert('Por favor preencha todos os campos');
+        }
+
+        //manda o request para o registo
+        $.ajax({
+                type: "POST",
+                url: 'registo',
+                data: JSON.stringify({user: user, pass: pass}),
+                success: (data, status, xhttp) => {
+                    if (!data.success)
+                        alert(data.msg)
+                    console.log(data, status, xhttp)
+                },
+                error: (data, status, xhttp) => {
+                    let response = data.responseJSON
+                    if (response.CsrfError)
+                        alert(response.msg)
+                },
+                contentType: "application/json",
+                dataType: 'json'
+
+            }
+        )
+    }
 
 //#endregion
 
