@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+    <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
     <ul class="tab tab-block">
         <li class="tab-item active">
             <a href="#registo" data-tab="registo">Registo</a>
@@ -26,7 +27,7 @@
                 <label class="form-label" for="input-example-3">Password</label>
                 <input class="form-input" type="password" id="input-registo-password" placeholder="Password">
             </div>
-            <button type="button" class="btn">Registar</button>
+            <button id="btn-registo" type="button" class="btn">Registar</button>
         </form>
 
     </div>
@@ -42,7 +43,7 @@
                 <label class="form-label" for="input-login-password">Password</label>
                 <input class="form-input" type="password" id="input-login-password" placeholder="Password">
             </div>
-            <button type="button"  class="btn">Login</button>
+            <button id="btn-login" type="button"  class="btn">Login</button>
         </form>
 
     </div>
