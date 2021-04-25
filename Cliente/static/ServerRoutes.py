@@ -1,5 +1,5 @@
-SERVER = "http://149.90.108.93:80"
+SERVER = "http://149.90.108.93:5000/"
 ROUTES = {
-    'login': SERVER + "/login",
-    'registo': SERVER + "/registo"
+    'login': SERVER + "login",
+    'registo': SERVER + "registo"
 }

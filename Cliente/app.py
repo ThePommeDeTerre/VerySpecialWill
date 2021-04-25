@@ -32,7 +32,7 @@ def login():
         params, valid = Common.trim_params(params)
 
         url = SerRoutes.ROUTES['login']
-        # response = requests.post(url, data=params)
+        response = requests.post(url, json=params)
 
         if valid:
             return Common.create_response_message(200, True)
