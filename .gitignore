@@ -7,3 +7,4 @@ Cliente/.idea/*
 Cliente/helpers/__pycache__/*
 Servidor/.idea/*
 .vscode
+*.log
