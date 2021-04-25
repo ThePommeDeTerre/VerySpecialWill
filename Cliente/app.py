@@ -1,9 +1,11 @@
 from flask import Flask, render_template, session, request
 import secrets
 import helpers.SessionHelper as SessionHelper
+import helpers.CommonHellper as Common
+import static.ServerRoutes as SerRoutes
 import json
 
-# este nao usem o pip para instalar, mas o gestor de packages do pycharm
+# Este nao usem o pip para instalar, mas o gestor de packages do pycharm
 from flask_wtf.csrf import CSRFProtect, CSRFError
 import requests
 
@@ -24,56 +26,47 @@ def main():
 @app.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
-        valid = True
         params = request.get_json();
 
         # Fazer o trim dos fields e verificar se estao vazias
-        for p in params.keys():
-            params[p] = params[p].rstrip()
-            if not params[p]:
-                valid = False
+        params, valid = Common.trim_params(params)
 
-        url = "http://149.90.108.93:80"
+        url = SerRoutes.ROUTES['login']
         # response = requests.post(url, data=params)
+
         if valid:
-            return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+            return Common.create_response_message(200, True)
         else:
-            return json.dumps({'success': False, 'msg': 'Por favor preencha todos os campos'}), 200, {
-                'ContentType': 'application/json'}
+            return Common.create_response_message(200, False, 'Por favor preencha todos os campos')
 
     else:
-        return json.dumps({'success': False, 'msg': 'Ocorreu um erro'}), 200, {'ContentType': 'application/json'}
+        return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 
 # Efetua o registo
 @app.route('/registo', methods=['POST'])
 def registo():
     if request.method == 'POST':
-        valid = True
         params = request.get_json();
 
-        # Fazer o trim dos fields e verificar se estao vazias
-        for p in params.keys():
-            params[p] = params[p].rstrip()
-            if not params[p]:
-                valid = False
+        # Fazer o trim dos fields e verificar se estao vazios
+        params, valid = Common.trim_params(params)
 
-        url = "http://149.90.108.93:80"
+        url = SerRoutes.ROUTES['registo']
         # response = requests.post(url, data=params)
         if valid:
-            return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+            return Common.create_response_message(200, True)
         else:
-            return json.dumps({'success': False, 'msg': 'Por favor preencha todos os campos'}), 200, {
-                'ContentType': 'application/json'}
+            return Common.create_response_message(200, False, 'Por favor preencha todos os campos')
 
     else:
-        return json.dumps({'success': False, 'msg': 'Ocorreu um erro'}), 200, {'ContentType': 'application/json'}
+        return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 
 # Como é por ajax, mudo o primeiro parametro para json, e retorno uma mensagem de erro
 @app.errorhandler(CSRFError)
 def handle_csrf_error(e):
-    return json.dumps({'CsrfError': True, 'msg': 'Csrf Inválido'}), 400, {'ContentType': 'application/json'}
+    return Common.create_response_message(400, True, 'Csrf Inválido', {'CsrfError': True})
 
 
 if __name__ == '__main__':
