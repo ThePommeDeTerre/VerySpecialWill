@@ -1,30 +1,27 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template
+from flask_cors import CORS
+from flask_mysqldb import MySQL
+from settings import MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB
+from blueprint_auth import authentication
 import json
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
+# initialize the Flask app and the MySQL configuration from env - obtained with setting.py
+app.config["MYSQL_USER"] = MYSQL_USER
+app.config["MYSQL_PASSWORD"] = MYSQL_PASSWORD
+app.config["MYSQL_DB"] = MYSQL_DB
+app.config["MYSQL_CURSORCLASS"] = "DictCursor"
+
+db = MySQL(app)
+
+app.register_blueprint(authentication, url_prefix="/api/auth")
+
+
+@app.route('/')
 def hello_world():
     return render_template('index.html')
 
-@app.route('/hello')
-def chopstick():
-    chopstick = {
-        'color': 'rainbow',
-        'left_handed': True
-    }
-    return jsonify(chopstick)
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    try:
-        #return json.dumps(request)
-        params = request.get_json()
-        return json.dumps(params), 200, {'ContentType': 'application/json'}
-        
-    except Exception as e:
-        return json.dumps(e)
 
 if __name__ == '__main__':
     app.debug=True
