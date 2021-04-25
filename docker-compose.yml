@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   flask_server:
-    image: tiangolo/uwsgi-nginx-flask:latest
+    build: .
     ports:
       - '5000:80'                                 # external port : internal port
     volumes: 
@@ -16,8 +16,6 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
       MYSQL_DATABASE: auth_DB
-    ports:
-      - '3306:3306'
     volumes:
       - auth_db:/var/lib/mysql                  # data will be persisted here
       - ./Databases/auth_database.sql:/docker-entrypoint-initdb.d/auth_database.sql
