@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  server:
+    image: tiangolo/uwsgi-nginx-flask:latest
+    ports:
+      - "5000:80"                               # external port : internal port
+    volumes: 
+      - ./Servidor:/app                         # copy project to container
+
+  database:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    # check mySQL database addr (Server field): 
+      # docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_hash>
+
+# TODO:
+#networks:
