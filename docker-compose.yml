@@ -1,14 +1,11 @@
 version: "3.9"
 services:
   server:
-    build: .
+    image: tiangolo/uwsgi-nginx-flask:latest
     ports:
       - "5000:80"                               # external port : internal port
     volumes: 
       - ./Servidor:/app                         # copy project to container
-      - keysVolume:/krb5.keytab
-    environment: 
-      KRB5_KTNAME: /krb5.keytab
 
   database:
     image: mysql
@@ -27,6 +24,3 @@ services:
 
 # TODO:
 #networks:
-
-volumes:
-  keysVolume:
