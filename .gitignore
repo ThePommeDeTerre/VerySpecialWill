@@ -2,5 +2,7 @@ Cliente/__pycache__/*
 Servidor/__pycache__/*
 __pycache__/*
 .idea/*
+Cliente/helpers/__pycache__/*
 Cliente/.idea/*
 Cliente/helpers/__pycache__/*
+Servidor/.idea/*
