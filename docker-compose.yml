@@ -1,26 +1,37 @@
 version: "3.9"
 services:
-  server:
+  flask_server:
     image: tiangolo/uwsgi-nginx-flask:latest
     ports:
-      - "5000:80"                               # external port : internal port
+      - '5000:80'                                 # external port : internal port
     volumes: 
-      - ./Servidor:/app                         # copy project to container
+      - ./Servidor:/app                           # copy project to container
 
-  database:
+  auth_database:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DATABASE: auth_DB
+    ports:
+      - '3306:3306'
+    volumes:
+      - auth_db:/var/lib/mysql                  # data will be persisted here
+      - ./Databases/auth_database.sql:/docker-entrypoint-initdb.d/auth_database.sql
 
-  adminer:
+  auth_adminer:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - '8080:8080'
     # check mySQL database addr (Server field): 
       # docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_hash>
+
+volumes:
+  auth_db:
 
 # TODO:
 #networks:
