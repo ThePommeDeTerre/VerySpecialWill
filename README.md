@@ -5,7 +5,7 @@ Projeto de Segurança de Sistemas Informáticos
 
 ## Arquitetura
 ### Arquitetura Geral do Sistema
-![](https://i.imgur.com/4UXFECC.png)
+![](https://i.imgur.com/6jExFcK.png)
 ### Esquema da Base de Dados de Autenticação
 ![](https://i.imgur.com/MwflL2a.png)
 ### Esquema da Base de Dados de Serviço
