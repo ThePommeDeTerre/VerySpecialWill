@@ -66,6 +66,8 @@ const IndexHelper = function () {
                     btnElement.attr('disabled', false)
                     if (!data.success)
                         handleAjaxError(data)
+                    else
+                        alert('nice')
                 },
                 error: (data) => {
                     // Retira o disabled
@@ -103,6 +105,8 @@ const IndexHelper = function () {
 
                     if (!data.success)
                         handleAjaxError(data)
+                    else
+                        alert('nice')
                 },
                 error: (data) => {
                     // Retira o disabled

@@ -45,9 +45,9 @@ def login():
 
             # Tratamento da resposta
             response_params = response.json()
-            if response_params.status == 'ok':
+            if response_params['status'] == 'OK':
                 return Common.create_response_message(200, True)
-            elif response_params.status == 'nok':
+            elif response_params['status'] == 'NOK':
                 return Common.create_response_message(200, False, response_params.message)
             else:
                 return Common.create_response_message(200, False, 'Ocorreu um erro, por favor contrate o suporte')
@@ -82,9 +82,9 @@ def registo():
 
             # Tratamento da resposta
             response_params = response.json()
-            if response_params.status == 'ok':
+            if response_params['status'] == 'OK':
                 return Common.create_response_message(200, True)
-            elif response_params.status == 'nok':
+            elif response_params['status'] == 'NOK':
                 return Common.create_response_message(200, False, response_params.message)
             else:
                 return Common.create_response_message(200, False, 'Ocorreu um erro, por favor contrate o suporte')

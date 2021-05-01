@@ -1,3 +1,4 @@
+from flask import escape
 import json
 
 
@@ -5,7 +6,8 @@ import json
 def trim_params(params):
     valid = True
     for p in params.keys():
-        params[p] = params[p].rstrip()
+        #faz strip ao parametro e faz sanitize (impedir xss)
+        params[p] = escape(params[p].rstrip())
         if not params[p]:
             valid = False
     return params, valid
