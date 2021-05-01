@@ -5,7 +5,7 @@ Projeto de Segurança de Sistemas Informáticos
 
 ## Arquitetura
 ### Arquitetura Geral do Sistema
-![](https://i.imgur.com/6jExFcK.png)
+![](https://i.imgur.com/4UXFECC.png)
 ### Esquema da Base de Dados de Autenticação
 ![](https://i.imgur.com/MwflL2a.png)
 ### Esquema da Base de Dados de Serviço
@@ -16,7 +16,7 @@ Projeto de Segurança de Sistemas Informáticos
 - Docker;
 - Python 3.8;
 - Flask 1.1.2;
-- Pycharm ou Visual Studio Code (não obrogatório).
+- Pycharm ou Visual Studio Code (não obrigatório).
 
 ### Obter o sistema
 Para obter o sistema, o seguinte comando pode ser utilizado:
