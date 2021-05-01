@@ -53,6 +53,7 @@ def login_user():
     user_token = validate_user(user_email, user_password)
 
     if user_token:
+        # returns the session token
         return jsonify({"jwt_token": user_token})
     else:
         # UNAUTORIZED - credentials not valid
