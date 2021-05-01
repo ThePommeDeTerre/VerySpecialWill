@@ -7,15 +7,30 @@
 
 {% block content %}
     <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
+
+
+
     <h3 style="text-align: center;width: 100%;font-family: 'Comic Sans MS'">
         <img src="{{ url_for('static', filename='cross.svg') }}" width="30px" height="30px">
         <img src="{{ url_for('static', filename='sad-tear.svg') }}" width="30px" height="30px">
         <img src="{{ url_for('static', filename='coins.svg') }}" width="30px" height="30px">
         A Very Special Will
-        <img src="{{ url_for('static', filename='coins.svg') }}"  width="30px" height="30px">
+        <img src="{{ url_for('static', filename='coins.svg') }}" width="30px" height="30px">
         <img src="{{ url_for('static', filename='sad-tear.svg') }}" width="30px" height="30px">
         <img src="{{ url_for('static', filename='cross.svg') }}" width="30px" height="30px">
     </h3>
+    <h4 id="alert-messages" style="width:100%">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div  style="text-align: center" class="toast toast-{{ category }}">
+
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </h4>
     <ul class="tab tab-block">
         <li class="tab-item active">
             <a href="#registo" data-tab="registo">Registo</a>
@@ -52,7 +67,7 @@
                 <label class="form-label" for="input-login-password">Password</label>
                 <input class="form-input" type="password" id="input-login-password" placeholder="Password">
             </div>
-            <button id="btn-login" type="button"  class="btn">Login</button>
+            <button id="btn-login" type="button" class="btn">Login</button>
         </form>
 
     </div>

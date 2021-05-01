@@ -1,16 +1,13 @@
 // Controlador do index
 const IndexHelper = function () {
 
-    //Funcao para ajudar a ver se está vazio
+    //Funcao para ajudar a ver se está vazio (because javascript)
     const isEmpty = function (value) {
         return typeof value == 'string' && !value.trim() || typeof value == 'undefined' || value === null;
     }
 
-    const init = () => {
-        initTab()
-        initForm()
-
-        // Mete o atual csrf sempre que é efetuada uma mensagem ajax
+    // Mete o atual csrf sempre que é efetuada uma chamada ajax
+    const setupAjax = () => {
         $.ajaxSetup({
             beforeSend: function (xhr, settings) {
                 const csrf = $('#csrf_token').val();
@@ -21,6 +18,24 @@ const IndexHelper = function () {
         });
     }
 
+    const handleAjaxError = (data) => {
+        const divMessages = $('#alert-messages');
+        divMessages.html('')
+
+        let message = data.msg ? data.msg : ''
+
+        let errorDiv = $('<div>')
+        errorDiv.addClass('toast toast-error').text(message)
+        divMessages.append(errorDiv)
+
+    }
+
+    const init = () => {
+        initTab()
+        initForm()
+        setupAjax()
+    }
+
     //#region formulário
     //Inicializa o formulário, botões e ações
     const initForm = () => {
@@ -29,6 +44,10 @@ const IndexHelper = function () {
     }
 
     const login = function () {
+        // Seleciona o botão pressionado e faz disable (impedir multiple requests)
+        let btnElement = $(this);
+        btnElement.attr('disabled', true)
+
         const user = $('#input-login-username').val();
         const pass = $('#input-login-password').val();
 
@@ -42,15 +61,16 @@ const IndexHelper = function () {
                 type: "POST",
                 url: 'login',
                 data: JSON.stringify({user: user, pass: pass}),
-                success: (data, status, xhttp) => {
+                success: (data, status) => {
+                    // Retira o disabled
+                    btnElement.attr('disabled', false)
                     if (!data.success)
-                        alert(data.msg)
-                    console.log(data, status, xhttp)
+                        handleAjaxError(data)
                 },
-                error: (data, status, xhttp) => {
-                    let response = data.responseJSON
-                    if (response.CsrfError)
-                        alert(response.msg)
+                error: (data) => {
+                    // Retira o disabled
+                    btnElement.attr('disabled', false)
+                    handleAjaxError(data.responseJSON)
                 },
                 contentType: "application/json",
                 dataType: 'json'
@@ -60,6 +80,10 @@ const IndexHelper = function () {
     }
 
     const registo = function () {
+        // Seleciona o botão pressionado e faz disable (impedir multiple requests)
+        let btnElement = $(this);
+        btnElement.attr('disabled', true)
+
         const user = $('#input-registo-username').val();
         const pass = $('#input-registo-password').val();
 
@@ -74,14 +98,16 @@ const IndexHelper = function () {
                 url: 'registo',
                 data: JSON.stringify({user: user, pass: pass}),
                 success: (data, status, xhttp) => {
+                    // Retira o disabled
+                    btnElement.attr('disabled', false)
+
                     if (!data.success)
-                        alert(data.msg)
-                    console.log(data, status, xhttp)
+                        handleAjaxError(data)
                 },
-                error: (data, status, xhttp) => {
-                    let response = data.responseJSON
-                    if (response.CsrfError)
-                        alert(response.msg)
+                error: (data) => {
+                    // Retira o disabled
+                    btnElement.attr('disabled', false)
+                    handleAjaxError(data.responseJSON)
                 },
                 contentType: "application/json",
                 dataType: 'json'

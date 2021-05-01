@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, flash
 import secrets
 import helpers.SessionHelper as SessionHelper
 import helpers.CommonHellper as Common
@@ -19,47 +19,80 @@ csrf = CSRFProtect(app)
 @app.route('/')
 def main():
     SessionHelper.start_session(app)
+    flash("Welcome to death", "success")
     return render_template('login.html')
 
 
 # Efetua o login, caso seja inválido ou nao seja post, retorna mensagem de erro
 @app.route('/login', methods=['POST'])
 def login():
-    if request.method == 'POST':
-        params = request.get_json();
+    try:
+        if request.method == 'POST':
+            params = request.get_json();
 
-        # Fazer o trim dos fields e verificar se estao vazias
-        params, valid = Common.trim_params(params)
+            # Fazer o trim dos fields e verificar se estao vazias
+            params, valid = Common.trim_params(params)
 
-        url = SerRoutes.ROUTES['login']
-        response = requests.post(url, json=params)
+            if not valid:
+                return Common.create_response_message(200, False, 'Por favor preencha todos os campos')
 
-        if valid:
-            return Common.create_response_message(200, True)
+            url = SerRoutes.ROUTES['login']
+            response = requests.post(url, json=params)
+
+            # Caso a resposta nao seja ok
+            if response.status_code != 200:
+                raise Exception()
+
+            # Tratamento da resposta
+            response_params = response.json()
+            if response_params.status == 'ok':
+                return Common.create_response_message(200, True)
+            elif response_params.status == 'nok':
+                return Common.create_response_message(200, False, response_params.message)
+            else:
+                return Common.create_response_message(200, False, 'Ocorreu um erro, por favor contrate o suporte')
+
         else:
-            return Common.create_response_message(200, False, 'Por favor preencha todos os campos')
+            return Common.create_response_message(200, False, 'Ocorreu um erro')
 
-    else:
+    # Caso haja erros de status ou conexão
+    except:
         return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 
 # Efetua o registo
 @app.route('/registo', methods=['POST'])
 def registo():
-    if request.method == 'POST':
-        params = request.get_json();
+    try:
+        if request.method == 'POST':
+            params = request.get_json();
 
-        # Fazer o trim dos fields e verificar se estao vazios
-        params, valid = Common.trim_params(params)
+            # Fazer o trim dos fields e verificar se estao vazios
+            params, valid = Common.trim_params(params)
 
-        url = SerRoutes.ROUTES['registo']
-        # response = requests.post(url, data=params)
-        if valid:
-            return Common.create_response_message(200, True)
+            if not valid:
+                return Common.create_response_message(200, False, 'Por favor preencha todos os campos')
+
+            url = SerRoutes.ROUTES['registo']
+            response = requests.post(url, json=params)
+
+            # Caso a resposta nao seja ok
+            if response.status_code != 200:
+                raise Exception()
+
+            # Tratamento da resposta
+            response_params = response.json()
+            if response_params.status == 'ok':
+                return Common.create_response_message(200, True)
+            elif response_params.status == 'nok':
+                return Common.create_response_message(200, False, response_params.message)
+            else:
+                return Common.create_response_message(200, False, 'Ocorreu um erro, por favor contrate o suporte')
+
         else:
-            return Common.create_response_message(200, False, 'Por favor preencha todos os campos')
-
-    else:
+            return Common.create_response_message(200, False, 'Ocorreu um erro')
+    # Caso haja erros de status ou conexão
+    except:
         return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 
