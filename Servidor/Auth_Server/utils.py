@@ -7,6 +7,8 @@ Validation of user inputs
 from hashlib import pbkdf2_hmac
 from flask_mysqldb import MySQLdb
 from settings import JWT_SECRET_KEY
+from main import db
+
 import os
 import jwt
 

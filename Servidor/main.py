@@ -1,36 +1,17 @@
 """
 
-Authentication Server main file
+Main Server file
 
 """
 
-from flask import Flask, render_template, jsonify
-from flask_cors import CORS
-from flask_mysqldb import MySQL
-from settings import MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB
-from blueprint_auth import authentication
-import json
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
-# initialize the Flask app and the MySQL configuration from env - obtained with settings.py
-app.config["MYSQL_USER"] = MYSQL_USER
-app.config["MYSQL_PASSWORD"] = MYSQL_PASSWORD
-app.config["MYSQL_DB"] = MYSQL_DB
-app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 
-db = MySQL(app)
-
-app.register_blueprint(authentication, url_prefix="/api/auth")
-
-
-@app.route('/login', methods=['POST'])
+@app.route('/')
 def run():
-    return jsonify(
-        {
-            "status":"OK"
-        }
-    )
+    return render_template('index.html')
 
 
 if __name__ == '__main__':

@@ -1,11 +1,18 @@
 version: "3.9"
 services:
   flask_server:
-    build: .
+    image: tiangolo/uwsgi-nginx-flask:latest
     ports:
       - '5000:80'                                 # external port : internal port
     volumes: 
       - ./Servidor:/app                           # copy project to container
+
+  auth_server:
+    build: .
+    ports:
+      - '5005:88'
+    volumes: 
+      - ./Servidor/Auth_Server:/app
 
   auth_database:
     image: mysql
