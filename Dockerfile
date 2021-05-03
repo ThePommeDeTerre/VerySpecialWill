@@ -5,3 +5,4 @@ run pip install flask-mysqldb
 run pip install flask-jwt 
 run pip install flask-cors 
 run pip install python-dotenv
+run pip install mysql-connector-python

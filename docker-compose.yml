@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   flask_server:
     image: tiangolo/uwsgi-nginx-flask:latest
@@ -13,6 +14,8 @@ services:
       - '5005:88'
     volumes: 
       - ./Servidor/Auth_Server:/app
+    links:
+      - auth_database
 
   auth_database:
     image: mysql
@@ -23,20 +26,33 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
       MYSQL_DATABASE: auth_DB
+    ports:
+      - '3306'
     volumes:
       - auth_db:/var/lib/mysql                  # data will be persisted here
       - ./Databases/auth_database.sql:/docker-entrypoint-initdb.d/auth_database.sql
+    networks:
+      backend:
+        ipv4_address: 172.20.1.1
 
   auth_adminer:
     image: adminer
     restart: always
     ports:
       - '8080:8080'
+    networks:
+      backend:
+        ipv4_address: 172.20.1.2
     # check mySQL database addr (Server field): 
       # docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container_hash>
 
 volumes:
   auth_db:
 
-# TODO:
-#networks:
+networks:
+  backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.1.0/16
