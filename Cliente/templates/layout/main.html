@@ -4,21 +4,21 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/spectre-exp.min.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/spectre-icons.min.css') }}">
 <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">-->
-<script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 
 <section class="content" style="margin-top: 40px">
-  <header>
-    {% block header %}{% endblock %}
-  </header>
-      <div class="container">
+    <header>
+        {% block header %}{% endblock %}
+    </header>
+    <div class="container">
         <div class="columns">
-            <div class="column col-3"></div>
-            <div class="column col-6">
-  {% block content %}
+            <div class="column col-2"></div>
+            <div class="column col-8">
+                {% block content %}
 
-  {% endblock %}
+                {% endblock %}
             </div>
-            <div class="column col-3"></div>
+            <div class="column col-2"></div>
         </div>
-      </div>
+    </div>
 </section>

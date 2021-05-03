@@ -1,0 +1,45 @@
+{% extends 'layout/main.html' %}
+
+
+{% block header %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+    <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
+    <div class="columns">
+        <div class="column col-5">
+            <h5>Instructions!</h5>
+            <ul>
+                <li>Download <a
+                        href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
+                        target="_blank">Google Authenticator</a> on your mobile.
+                </li>
+                <li>Create a new account with <strong>setup key</strong> method.</li>
+                <li>Provide the required details (name, secret key).</li>
+                <li>Select time-based authentication.</li>
+                <li>Submit the generated key in the form.</li>
+                <li><strong>OR</strong> You can also scan the bellow qr code in the app</li>
+            </ul>
+            <div class="form-group">
+                <label class="form-label" for="secret">Secret Token</label>
+                <input type="text" class="form-input" id="secret" value="{{ secret }}"  readonly />
+            </div>
+            <img style="max-width: 300px" src="{{ qrcode(secreturi) }}">
+        </div>
+        <div class="column col-1"></div>
+        <div class="column col-5">
+            <form method="POST">
+                <input type="hidden" name="secret" value="{{ secret }}" required>
+                <div class="form-group">
+                    <label class="form-label" for="secret">Code</label>
+                    <input type="number" name="otp" type="text" class="form-input" id="otp"/>
+                </div>
+                <div class="text-left">
+                    <button type="submit" class="btn btn-primary">Authenticate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
