@@ -12,7 +12,7 @@ load_dotenv()
 #MySQL Config
 MYSQL_USER = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
-MYSQL_DB = os.getenv("MYSQL_DB")
+MYSQL_DB = os.getenv("MYSQL_DATABASE")
 
 # JWT Config
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
