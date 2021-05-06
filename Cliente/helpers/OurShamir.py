@@ -1,8 +1,9 @@
 from Crypto.Protocol.SecretSharing import Shamir
-from ourHMAC import ourHMAC, HMACVerificationError
+from OurHMAC import OurHMAC, HMACVerificationError
 from typing import List
 
-class ourShamir():
+
+class OurShamir:
     """
     Abstraction from Crypto.Protocol.SecretSharing.Shamir
 
@@ -12,12 +13,12 @@ class ourShamir():
     combine() -> bytes
     """
 
-
-    @staticmethod
-    def split_secret(self, min_shares:int, n:int, key:bytes) -> List[(int, bytes)]:
+    @classmethod
+    def split_secret(cls, min_shares: int, n: int, key: bytes) -> List[(int, bytes)]:
         """
         Split a secret into n shares.
-        The secret can be reconstructed later using just k shares out of the original n. Each share must be kept confidential to the person it was assigned to.
+        The secret can be reconstructed later using just k shares out of the original n.
+        Each share must be kept confidential to the person it was assigned to.
         Each share is associated to an index (starting from 1).
         A secret is split into n shares, and it is sufficient to collect k of them to reconstruct the secret.
         
@@ -45,9 +46,8 @@ class ourShamir():
             raise ShamirSecretSplitException()
         return Shamir.split(min_shares, n, key)
 
-
-    @staticmethod
-    def combine(self, min_shares:int, shares:int, hmac:bytes, hmac_key:bytes, mode='SHA512') -> bytes:
+    @classmethod
+    def combine(cls, min_shares: int, shares: int, hmac: bytes, hmac_key: bytes, mode='SHA512') -> bytes:
         """
         Recombine and verify a secret, only if enough shares are presented.
         
@@ -55,7 +55,7 @@ class ourShamir():
         ----------
         min_shares : int
             The sufficient number of shares to reconstruct the secret
-        n : int
+        shares : int
             The number of shares that this method will create.
         hmac : bytes
             HMAC of the secret before the split.
@@ -72,17 +72,18 @@ class ourShamir():
         -------
         Reconstructed key.
         """
-        
+
         if len(shares) < min_shares:
             raise ShamirCombineException(min_shares, len(shares))
         else:
-            h = ourHMAC(mode, hmac_key)
+            h = OurHMAC(mode, hmac_key)
             res = Shamir.combine(shares)
 
-            if h.verificar_hmac(hmac, res):
+            if h.verify_hmac(hmac, res):
                 return res
             else:
                 raise HMACVerificationError()
+
 
 class ShamirCombineException(Exception):
     def __init__(self, expected_n, received_n, message="Expected %d shares, received %d"):
@@ -90,6 +91,7 @@ class ShamirCombineException(Exception):
         self.received_n = received_n
         self.message = message
         super().__init__(self.message % (expected_n, received_n))
+
 
 class ShamirSecretSplitException(Exception):
     def __init__(self):
