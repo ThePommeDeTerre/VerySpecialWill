@@ -112,3 +112,8 @@ class ourHMAC():
             print('Cryptographic hash function changed to {0}\n'.format(mode))
         else:
             print('Unrecognized cryptographic hash function')
+
+class HMACVerificationError(Exception):
+    def __init__ (self, message="Authentication error"):
+        self.message = message
+        super().__init__(self.message)
