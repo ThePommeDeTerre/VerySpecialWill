@@ -14,3 +14,6 @@ CREATE TABLE user_table (
     pwd_hash VARCHAR(150) NOT NULL,
     PRIMARY KEY (username)
 );
+
+INSERT INTO user_table (username, mail, pwd_hash, pwd_salt)
+VALUES ('PommeDeTerre', 'emailbunito@email.com', 'ashkfreuiagbvg', '98345bgfjsal');
