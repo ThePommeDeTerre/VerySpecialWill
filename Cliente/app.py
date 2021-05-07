@@ -1,6 +1,6 @@
 import time
 
-from flask import Flask, render_template, session, request, flash, send_file
+from flask import Flask, render_template, session, request, flash, send_file, redirect, url_for
 import secrets
 import helpers.SessionHelper as SessionHelper
 import helpers.CommonHellper as Common
@@ -13,8 +13,6 @@ from flask_qrcode import QRcode
 
 import requests
 
-
-
 app = Flask(__name__)
 qrcode = QRcode(app)
 
@@ -23,10 +21,11 @@ app.config["SECRET_KEY"] = secrets.token_urlsafe(16)
 csrf = CSRFProtect(app)
 
 
+# region index
 @app.route('/')
 def main():
     SessionHelper.start_session(app)
-    flash("Welcome to death", "success")
+    # flash("Welcome to death", "success")
     return render_template('login.html')
 
 
@@ -103,11 +102,7 @@ def registo():
         return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 
-# Como é por ajax, mudo o primeiro parametro para json, e retorno uma mensagem de erro
-@app.errorhandler(CSRFError)
-def handle_csrf_error(e):
-    return Common.create_response_message(400, True, 'Csrf Inválido', {'CsrfError': True})
-
+# endregion
 
 # region 2fa
 @app.route('/login/2fa', methods=['GET'])
@@ -121,17 +116,42 @@ def login_2fa():
             secret = pyotp.random_base32()
             uri = pyotp.totp.TOTP(secret).provisioning_uri(name='test@google.com', issuer_name='A Very Special Will')
             secreturi = uri
-            return render_template('login_2fa.html', secret=secret,secreturi = secreturi)
+            return render_template('login_2fa.html', secret=secret, secreturi=secreturi)
     # Caso haja erros de status ou conexão
     except Exception  as e:
         print(e)
         return Common.create_response_message(200, False, 'Ocorreu um erro')
+
 
 @app.route("/qrcode", methods=["GET"])
 def get_qrcode():
     # please get /qrcode?data=<qrcode_data>
     data = request.args.get("data", "")
     return send_file(qrcode(data, mode="raw"), mimetype="image/png")
+
+
+# endregion
+
+
+# region beforeRequest
+@app.before_request
+def before_request():
+    request_guest_handpoints = ['login', 'registo', 'qrcode', 'main']
+    # implementar função de teste de sessão
+
+    if True and (request.endpoint not in request_guest_handpoints):
+        return redirect(url_for('main'))
+    return
+
+
+# endregion
+
+# region errorHandling
+# Como é por ajax, mudo o primeiro parametro para json, e retorno uma mensagem de erro
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    return Common.create_response_message(400, True, 'Csrf Inválido', {'CsrfError': True})
+
 
 # endregion
 
