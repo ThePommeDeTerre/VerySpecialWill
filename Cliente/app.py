@@ -1,17 +1,19 @@
 import time
 
-import express as express
-from flask import Flask, render_template, session, request, flash, send_file, redirect, url_for
+import jwt
+from flask import Flask, render_template, session, request, flash, send_file, redirect, url_for, g,escape
 import secrets
 import helpers.SessionHelper as SessionHelper
 import helpers.CommonHellper as Common
 import static.ServerRoutes as SerRoutes
 import pyotp
+import jwt
 
 # Este nao usem o pip para instalar, mas o gestor de packages do pycharm
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_mail import Mail
 from flask_qrcode import QRcode
+
 
 import email_test
 import requests
@@ -29,10 +31,8 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 mail = Mail(app)
 
-
 # Cria a secret key para a sessão e ativa proteção por csrf
 app.config["SECRET_KEY"] = secrets.token_urlsafe(16)
-
 
 csrf = CSRFProtect(app)
 
@@ -68,9 +68,10 @@ def login():
             # Tratamento da resposta
             response_params = response.json()
             if response_params['status'] == 'OK':
+                test = jwt.decode(response_params['jwt'], 'ThisIsMyKey', algorithms="HS256")
                 return Common.create_response_message(200, True)
             elif response_params['status'] == 'NOK':
-                return Common.create_response_message(200, False, response_params.message)
+                return Common.create_response_message(200, False, response_params['message'])
             else:
                 return Common.create_response_message(200, False, 'Ocorreu um erro, por favor contrate o suporte')
 
@@ -99,7 +100,7 @@ def registo():
             response = requests.post(url, json=params)
 
             # Caso a resposta nao seja ok
-            if response.status_code != 200:
+            if response.status_code != 201:
                 raise Exception()
 
             # Tratamento da resposta
@@ -107,7 +108,7 @@ def registo():
             if response_params['status'] == 'OK':
                 return Common.create_response_message(200, True)
             elif response_params['status'] == 'NOK':
-                return Common.create_response_message(200, False, response_params.message)
+                return Common.create_response_message(200, False, response_params['message'])
             else:
                 return Common.create_response_message(200, False, 'Ocorreu um erro, por favor contrate o suporte')
 
@@ -146,24 +147,41 @@ def get_qrcode():
     return send_file(qrcode(data, mode="raw"), mimetype="image/png")
 
 
+# endregion
+
+# region email
 # Tentativa de enviar email
 @app.route("/send-email", methods=['GET'])
 def send_email():
     email_test.test_send(mail)
 
 
-
 # endregion
 
+
+@app.route('/createwill', methods=['POST','GET'])
+def createwill():
+    try:
+        if request.method == 'POST':
+            teste = 1
+        else:
+            return render_template('createwill.html')
+    # Caso haja erros de status ou conexão
+    except:
+        return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 # region beforeRequest
 @app.before_request
 def before_request():
     request_guest_handpoints = ['login', 'registo', 'qrcode', 'main', 'sendemail', 'static']
+    g.user = None
     # implementar função de teste de sessão
 
-    if True and (request.endpoint not in request_guest_handpoints):
+    if False and (request.endpoint not in request_guest_handpoints):
         return redirect(url_for('main'))
+    else:
+        g.user = {}
+        g.user['username'] = escape("Gunther")
     return
 
 

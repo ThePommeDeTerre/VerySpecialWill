@@ -3,22 +3,32 @@
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/spectre.min.css') }}">
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/spectre-exp.min.css') }}">
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/spectre-icons.min.css') }}">
-<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">-->
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 
-<section class="content" style="margin-top: 40px">
+<section class="content">
     <header>
         {% block header %}{% endblock %}
     </header>
-    <div class="container">
-        <div class="columns">
-            <div class="column col-2"></div>
-            <div class="column col-8">
-                {% block content %}
+    <div class="container grid-lg">
+        {% if g.user %}
+            <header style="background-color:rgb(252,252,252);padding: 0.5rem" class="navbar">
+                <section class="navbar-section">
+                    <a href="createwill" class="btn btn-link">Create New Will</a>
+                    <a href="#" class="btn btn-link">See Wills</a>
+                </section>
+                <section class="navbar-center">
+                    <strong>A Very Special Will</strong>
+                </section>
+                <section class="navbar-section">
+                    <a href="#" class="btn btn-link">{{g.user.username}}</a>
+                    <a href="#" class="btn btn-link">Logout</a>
+                </section>
+            </header>
+        {% endif %}
+        <div style="margin-top: 40px">
+            {% block content %}
 
-                {% endblock %}
-            </div>
-            <div class="column col-2"></div>
+            {% endblock %}
         </div>
     </div>
 </section>
