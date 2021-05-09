@@ -28,11 +28,12 @@ def register_user():
     username = get_from_json("username")
     user_email = get_from_json("email")
     user_password = get_from_json("password")
-    user_confirm_password = get_from_json("confirm_password")
+    # user_confirm_password = get_from_json("confirm_password")
 
-    if user_password == user_confirm_password and validate_user_input(
+    if validate_user_input(
         "authentication", email=user_email, password=user_password
     ):
+        # user_password == user_confirm_password and
         password_salt = generate_salt()
         password_hash = generate_hash(user_password, password_salt)
 
@@ -49,14 +50,15 @@ def register_user():
 
 @auth_blueprint.route("/login", methods=["POST"])
 def login_user():
-    user_email = get_from_json("username")
+    user_name = get_from_json("username")
     user_password = get_from_json("password")
 
-    if dbHelper.verify_user(user_email, user_password):
-        dataToEncode = {'user': user_email, 'maxtime': 'maxtime'}
+    if dbHelper.verify_user(user_name, user_password):
+        dataToEncode = {'user': user_name, 'maxtime': 'maxtime'}
         # returns the session token
-        return jsonify({"jwt_token": generate_jwt_token(dataToEncode)})
+        return jsonify({"jwt_token": generate_jwt_token(dataToEncode), "status": "OK"})
     else:
+        return jsonify({"status": "NOK", "message":"Invalid credentials"})
         # UNAUTORIZED - credentials not valid
         Response(status=401)
 
