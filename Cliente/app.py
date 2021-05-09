@@ -1,7 +1,4 @@
-import time
-
-import express as express
-from flask import Flask, render_template, session, request, flash, send_file, redirect, url_for
+from flask import Flask, render_template, request, send_file, redirect, url_for
 import secrets
 import helpers.SessionHelper as SessionHelper
 import helpers.CommonHellper as Common
@@ -13,22 +10,11 @@ from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_mail import Mail
 from flask_qrcode import QRcode
 
-import email_test
+from Servidor import email_test
 import requests
 
 app = Flask(__name__)
 qrcode = QRcode(app)
-
-# Configurações smtp para flask-email
-app.config['MAIL_SERVER'] = 'smtp.mailtrap.io'
-app.config['MAIL_PORT'] = 2525
-app.config['MAIL_USERNAME'] = 'ee8998e171334d'
-app.config['MAIL_DEFAULT_SENDER'] = 'ee8998e171334d'
-app.config['MAIL_PASSWORD'] = '674d5516a4c748'
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-mail = Mail(app)
-
 
 # Cria a secret key para a sessão e ativa proteção por csrf
 app.config["SECRET_KEY"] = secrets.token_urlsafe(16)
@@ -144,14 +130,6 @@ def get_qrcode():
     # please get /qrcode?data=<qrcode_data>
     data = request.args.get("data", "")
     return send_file(qrcode(data, mode="raw"), mimetype="image/png")
-
-
-# Tentativa de enviar email
-@app.route("/send-email", methods=['GET'])
-def send_email():
-    email_test.test_send(mail)
-
-
 
 # endregion
 
