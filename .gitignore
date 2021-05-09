@@ -8,7 +8,7 @@ Cliente/helpers/__pycache__/*
 Servidor/.idea/*
 .vscode
 *.log
-Servidor/Auth_Server/__pycache__/*
+Servidor/Auth_Server/__pycache__
 
 # Environments
 .env
