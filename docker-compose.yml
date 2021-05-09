@@ -5,9 +5,12 @@ services:
     container_name: main_flask_server
     image: tiangolo/uwsgi-nginx-flask:latest
     ports:
-      - '5005:88'                                 # external port : internal port
+      - '5000:80'                                 # external port : internal port
     volumes: 
       - ./Servidor:/app                           # copy project to container
+    networks: 
+      backend:
+        ipv4_address: 172.20.1.0
 
   auth_database:
     container_name: auth_database
@@ -41,11 +44,15 @@ services:
 
   auth_server:
     container_name: auth_flask_server
-    build: .
+    build: 
+      context: .
+      dockerfile: ./Auth_Server/Dockerfile
     ports:
-      - '5000:80'
+      - '5005:80'
     volumes: 
       - ./Servidor/Auth_Server:/app
+    environment:
+      JWT_SECRET_KEY: ThisIsMyKey
     #depends_on:
     #  - auth_database
     networks:
