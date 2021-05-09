@@ -2,6 +2,8 @@
 Set up of Flask's Blueprint for the user's authentication
 """
 
+import time
+
 from flask import (Blueprint,
                   request, 
                   Response, 
@@ -28,12 +30,10 @@ def register_user():
     username = get_from_json("username")
     user_email = get_from_json("email")
     user_password = get_from_json("password")
-    # user_confirm_password = get_from_json("confirm_password")
 
     if validate_user_input(
         "authentication", email=user_email, password=user_password
     ):
-        # user_password == user_confirm_password and
         password_salt = generate_salt()
         password_hash = generate_hash(user_password, password_salt)
 
@@ -54,13 +54,18 @@ def login_user():
     user_password = get_from_json("password")
 
     if dbHelper.verify_user(user_name, user_password):
-        dataToEncode = {'user': user_name, 'maxtime': 'maxtime'}
-        # returns the session token
+        # expiration time - 15 minutes
+        exp =  int(time.time())+900
+        # data to incorporate the message
+        dataToEncode = {'user': user_name, 'exp': exp}
+
+        # returns the session token with the status
         return jsonify({"jwt_token": generate_jwt_token(dataToEncode), "status": "OK"})
+    
     else:
         return jsonify({"status": "NOK", "message":"Invalid credentials"})
         # UNAUTORIZED - credentials not valid
-        Response(status=401)
+        # Response(status=401)
 
 # internal function
 def get_from_json(JSONKey):
