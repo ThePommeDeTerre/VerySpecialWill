@@ -21,11 +21,6 @@ class DBHelper:
     Get the database configuration
     """
     def read_db_config(self, filename, section):
-        """ Read database configuration file and return a dictionary object
-        :param filename: name of the configuration file
-        :param section: section of database configuration
-        :return: a dictionary of database parameters
-        """
         # create parser and read ini configuration file
         parser = ConfigParser()
         parser.read(filename)
@@ -73,7 +68,13 @@ class DBHelper:
 
             cursor.execute("SELECT pwd_salt, pwd_hash FROM user_table WHERE username = '%s'" % username)
 
-            (salt, hash) = cursor.fetchone()
+            record = cursor.fetchone()
+
+            if record is None:
+                return False
+
+            (salt, hash) = record   
+            
             pwd_hash = generate_hash(password, salt)
             if hash == pwd_hash:
                 return True

@@ -13,9 +13,10 @@ app = Flask(__name__)
 @app.route('/auth/<string:allowed_paths>', methods=['POST'])
 def to_auth_server(allowed_paths):
     if allowed_paths is not None:
-        # 308 - redirect, but preserve the content of your request
-        return redirect("http://localhost:5005/auth/%s" % allowed_paths, code=308)
-    return redirect("http://localhost:5005/auth/", code=301)
+        # 308 - Permanent Redirect, but preserve the content of your request
+        return redirect("http://149.90.108.93:5005/auth/%s" % allowed_paths, code=308)
+    # 301 - Moved Permanently     
+    return redirect("http://149.90.108.93:5005/auth/", code=301)
 
 @app.route('/')
 def run():

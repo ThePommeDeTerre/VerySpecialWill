@@ -1,6 +1,12 @@
 // Controlador do index
 const IndexHelper = function () {
 
+    const isEmail = function(email)
+    {
+        var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        return regex.test(email);
+    }
+
     //Funcao para ajudar a ver se está vazio (because javascript)
     const isEmpty = function (value) {
         return typeof value == 'string' && !value.trim() || typeof value == 'undefined' || value === null;
@@ -60,7 +66,7 @@ const IndexHelper = function () {
         $.ajax({
                 type: "POST",
                 url: 'login',
-                data: JSON.stringify({user: user, pass: pass}),
+                data: JSON.stringify({username: user, password: pass}),
                 success: (data, status) => {
                     // Retira o disabled
                     btnElement.attr('disabled', false)
@@ -88,17 +94,22 @@ const IndexHelper = function () {
 
         const user = $('#input-registo-username').val();
         const pass = $('#input-registo-password').val();
+        const email = $('#input-registo-email').val();
 
         //Verifica se os campos estao a vazio
-        if (isEmpty(user) || isEmpty(pass)) {
+        if (isEmpty(user) || isEmpty(pass) || isEmpty(email)) {
             return alert('Por favor preencha todos os campos');
+        }
+
+        if(!isEmail(email)){
+            return alert('Email inválido');
         }
 
         //manda o request para o registo
         $.ajax({
                 type: "POST",
                 url: 'registo',
-                data: JSON.stringify({user: user, pass: pass}),
+                data: JSON.stringify({username: user, password: pass, email: email}),
                 success: (data, status, xhttp) => {
                     // Retira o disabled
                     btnElement.attr('disabled', false)
