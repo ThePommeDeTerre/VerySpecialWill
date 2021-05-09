@@ -5,9 +5,7 @@ Validation of user inputs
 """
 
 from hashlib import pbkdf2_hmac
-from flask_mysqldb import MySQLdb
 from settings import JWT_SECRET_KEY
-#from main import db
 
 import os
 import jwt
@@ -15,13 +13,13 @@ import jwt
 
 def validate_user_input(input_type, **kwargs):
     if input_type == "authentication":
-        if len(kwargs["email"] <= 255 and len(kwargs["password"]) <= 255 ):
+        if len(kwargs["email"]) <= 255 and ( len(kwargs["password"]) <= 255 ):
             return True
         else:
             return False
 
 def generate_salt():
-    salt = os.urandom(128)
+    salt = os.urandom(16) # 16 byte -> 128 bit
     return salt.hex()
 
 def generate_hash(plain_password, password_salt):
@@ -33,37 +31,37 @@ def generate_hash(plain_password, password_salt):
     )
     return password_hash.hex()
 
-# write password to database
-def db_write(query, params):
-    cursor = db.connection.cursor()
-    try:
-        cursor.execute(query, params)
-        db.connection.commit()
-        cursor.close()
+# # write password to database
+# def db_write(query, params):
+#     cursor = db.connection.cursor()
+#     try:
+#         cursor.execute(query, params)
+#         db.connection.commit()
+#         cursor.close()
 
-        return True
+#         return True
     
-    except MySQLdb._exceptions.IntegrityError:
-        cursor.close()
-        return False
+#     except MySQLdb._exceptions.IntegrityError:
+#         cursor.close()
+#         return False
 
-# login with the credentials
-def db_read(query, params=None):
-    cursor = db.connection.cursor()
-    if params:
-        cursor.execute(query, params)
-    else:
-        cursor.execute(query)
+# # login with the credentials
+# def db_read(query, params=None):
+#     cursor = db.connection.cursor()
+#     if params:
+#         cursor.execute(query, params)
+#     else:
+#         cursor.execute(query)
 
-    entries = cursor.fetchall()
-    cursor.close()
+#     entries = cursor.fetchall()
+#     cursor.close()
 
-    content = []
+#     content = []
 
-    for entry in entries:
-        content.append(entry)
+#     for entry in entries:
+#         content.append(entry)
 
-    return content
+#     return content
 
 # generate a JWT to respond to the user
 def generate_jwt_token(content):
