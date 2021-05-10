@@ -7,40 +7,56 @@
 
 {% block content %}
 
-    <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
-    <div class="columns">
-        <div class="column col-5">
-            <h5>Instructions!</h5>
-            <ul>
-                <li>Download <a
-                        href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
-                        target="_blank">Google Authenticator</a> on your mobile.
-                </li>
-                <li>Create a new account with <strong>setup key</strong> method.</li>
-                <li>Provide the required details (name, secret key).</li>
-                <li>Select time-based authentication.</li>
-                <li>Submit the generated key in the form.</li>
-                <li><strong>OR</strong> You can also scan the bellow qr code in the app</li>
-            </ul>
-            <div class="form-group">
-                <label class="form-label" for="secret">Secret Token</label>
-                <input type="text" class="form-input" id="secret" value="{{ secret }}"  readonly />
+    <form method="post" action="/login/2fa">
+        <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="columns">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div style="text-align: center" class="toast toast-{{ category }}">
+
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% if g.user['2fa_token'] == 'NOK' %}
+                <div class="column col-5">
+                    <h5>Instructions!</h5>
+                    <ul>
+                        <li>Download <a
+                                href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
+                                target="_blank">Google Authenticator</a> on your mobile.
+                        </li>
+                        <li>Create a new account with <strong>setup key</strong> method.</li>
+                        <li>Provide the required details (name, secret key).</li>
+                        <li>Select time-based authentication.</li>
+                        <li>Submit the generated key in the form.</li>
+                        <li><strong>OR</strong> You can also scan the bellow qr code in the app</li>
+                    </ul>
+                    <div class="form-group">
+                        <label class="form-label" for="secret">Secret Token</label>
+                        <input name="secret" type="text" class="form-input" id="secret" value="{{ secret }}" readonly/>
+                    </div>
+                    <img style="max-width: 300px" src="{{ qrcode(secreturi) }}">
+                </div>
+            {% else %}
+                <input name="secret" type="hidden" class="form-input" id="secret" value="{{ g.user['2fa_token'] }}" readonly/>
+            {% endif %}
+            <div class="column col-1"></div>
+            <div class="column col-5">
+                <form method="POST">
+                    <input type="hidden" name="secret" value="{{ secret }}" required>
+                    <div class="form-group">
+                        <label class="form-label" for="secret">Code</label>
+                        <input type="number" name="otp" type="text" class="form-input" id="otp"/>
+                    </div>
+                    <div class="text-left">
+                        <a href="/login/cancel2fa" class="btn btn-primary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Authenticate</button>
+                    </div>
+                </form>
             </div>
-            <img style="max-width: 300px" src="{{ qrcode(secreturi) }}">
         </div>
-        <div class="column col-1"></div>
-        <div class="column col-5">
-            <form method="POST">
-                <input type="hidden" name="secret" value="{{ secret }}" required>
-                <div class="form-group">
-                    <label class="form-label" for="secret">Code</label>
-                    <input type="number" name="otp" type="text" class="form-input" id="otp"/>
-                </div>
-                <div class="text-left">
-                    <a href="/login/cancel2fa" class="btn btn-primary">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Authenticate</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    </form>
 {% endblock %}

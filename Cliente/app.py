@@ -12,8 +12,6 @@ import jwt
 # Este nao usem o pip para instalar, mas o gestor de packages do pycharm
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_qrcode import QRcode
-
-import email_test
 import requests
 
 app = Flask(__name__)
@@ -57,10 +55,13 @@ def login():
             # Tratamento da resposta
             response_params = response.json()
             if response_params['status'] == 'OK':
-                session['user'] = {'2fa_logged': False}
-                session['jwt'] = response_params['jwt_token']
-                # test = jwt.decode(response_params['jwt_token'], 'ThisIsMyKey', algorithms="HS512")
-                flash("Good Job", "danger")
+                session['user'] = \
+                    {
+                        '2fa_logged': False,
+                        '2fa_token': response_params['token_2fa'],
+                        'username': response_params['username'],
+                        'jwt_token': response_params['jwt_token'],
+                    }
                 return redirect(url_for('login_2fa'))
             elif response_params['status'] == 'NOK':
                 flash(response_params['message'], "danger")
@@ -129,11 +130,20 @@ def registo():
 def login_2fa():
     try:
         if request.method == 'POST':
-            params = request.get_json();
+            params = request.form.to_dict()
+            params, valid = Common.trim_params(params)
+
+            if not valid:
+                flash('Please fill all fields', "danger")
+                return redirect('/')
+
+            url = SerRoutes.ROUTES['registo']
+            response = requests.post(url, json=params)
         else:
             # ir buscar secret key do user, por enquanto usar random
             secret = pyotp.random_base32()
-            uri = pyotp.totp.TOTP(secret).provisioning_uri(name='test@google.com', issuer_name='A Very Special Will')
+            uri = pyotp.totp.TOTP(secret).provisioning_uri(name=(session['user']['username']),
+                                                           issuer_name='A Very Special Will')
             secreturi = uri
             return render_template('login_2fa.html', secret=secret, secreturi=secreturi)
     # Caso haja erros de status ou conexão
@@ -174,15 +184,17 @@ def before_request():
     request_guest_handpoints = ['login', 'registo', 'qrcode', 'main', 'sendemail', 'static']
 
     if 'user' in session:
-        # os gets de css
+        g.user = session['user']
+        # os gets de css ou de logout
         if request.endpoint in ['static', 'cancel_2fa', 'logout'] or request.endpoint is None:
             return
-
+        # caso esteja logged in mas nao tenha feito o 2fa
         if not session['user']['2fa_logged'] and request.endpoint != 'login_2fa':
-            flash('Please Authenticate Using 2FA', 'success')
+            flash('Please Authenticate Using 2FA', 'danger')
             return redirect(url_for('login_2fa'))
+        # caso esteja logged in mas nao tenha feito o 2fa
         else:
-            g.user = escape(session['user'])
+            g.user = session['user']
             return
     elif request.endpoint not in request_guest_handpoints:
         flash("Sem Acesso", "error")
