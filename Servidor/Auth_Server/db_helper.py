@@ -7,6 +7,7 @@ Here are defined the helper methods to communicate with the authetication databa
 
 from mysql.connector import MySQLConnection, Error
 from configparser import ConfigParser
+
 from utils import generate_hash
 
 class DBHelper:
@@ -48,11 +49,11 @@ class DBHelper:
                 yield row
 
     """
-    Get many data from the table
+    Get all data from the table
     """
     def query_with_fetchmany(self):
         try:
-            cursor = self.dbConnection.cursor()
+            cursor = self.dbConnection.cursor(prepared=True)
 
             cursor.execute("SELECT * FROM user_table")
 
@@ -62,21 +63,24 @@ class DBHelper:
         except Error as e:
             print(e)
 
+    """
+    Verify is a given user is in the database
+    """
     def verify_user(self, username, password):
         try:
-            cursor = self.dbConnection.cursor()
+            cursor = self.dbConnection.cursor(prepared=True)
 
-            cursor.execute("SELECT pwd_salt, pwd_hash FROM user_table WHERE username = '%s'" % username)
+            cursor.execute("SELECT pwd_salt, pwd_hash FROM user_table WHERE username = %s" , (username,))
 
             record = cursor.fetchone()
 
             if record is None:
                 return False
 
-            (salt, hash) = record   
+            (salt, hash) = record
             
-            pwd_hash = generate_hash(password, salt)
-            if hash == pwd_hash:
+            pwd_hash = generate_hash(password, salt.decode())
+            if hash.decode() == pwd_hash:
                 return True
             else:
                 return False
@@ -88,15 +92,38 @@ class DBHelper:
     Insert one single user
     """
     def insert_user(self, username, mail, pwd_salt, pwd_hash):
+
         query = "INSERT INTO user_table(username, mail, pwd_salt, pwd_hash) " \
                 "VALUES(%s,%s,%s,%s)"
         args = (username, mail, pwd_salt, pwd_hash)
 
         try:
-            cursor = self.dbConnection.cursor()
+            cursor = self.dbConnection.cursor(prepared=True)
             cursor.execute(query, args)
 
             self.dbConnection.commit()
             return True
         except:
             return False
+
+    """
+    Verify is 2FA for a given user is enabled and, if it is, the token is returned
+    """
+    def user_has_2fa(self, username):
+        
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+
+            cursor.execute("SELECT fa2_token FROM user_table WHERE username = %s" , (username,))
+
+            (value_2fa,) = cursor.fetchone()
+
+            if not value_2fa:
+                return "NOK"
+            else:
+                # convert to string
+                return value_2fa.decode()
+        
+        except Error as e:
+            print(e)
+            return "NOK"

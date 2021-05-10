@@ -26,7 +26,7 @@ git clone https://github.com/ThePommeDeTerre/VerySpecialWill.git
 
 ## Utilização
 ### Servidor
-No terminal, dentro da pasta Servidor, executar o seguinte comando:
+No terminal, dentro do projeto, executar o seguinte comando:
 ```bash
 docker-compose up
 ```
