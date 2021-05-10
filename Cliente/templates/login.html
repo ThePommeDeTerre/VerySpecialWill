@@ -6,7 +6,6 @@
 {% endblock %}
 
 {% block content %}
-    <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
 
 
 
@@ -42,36 +41,38 @@
 
     <div id="registo" class="tab-content">
 
-        <form id="form-registo">
+        <form id="form-registo" method="post" action="/registo" >
+            <input name="csrf_token" type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
             <div class="form-group">
                 <label class="form-label" for="input-registo-username">Username</label>
-                <input class="form-input" type="text" id="input-registo-username" placeholder="Name">
+                <input name="username" class="form-input" type="text" id="input-registo-username" placeholder="Name" required>
             </div>
             <div class="form-group">
                 <label class="form-label" for="input-registo-password">Password</label>
-                <input class="form-input" type="password" id="input-registo-password" placeholder="Password">
+                <input name="password" class="form-input" type="password" id="input-registo-password" placeholder="Password" required>
             </div>
             <div class="form-group">
                 <label class="form-label" for="input-registo-email">Email</label>
-                <input class="form-input" type="email" id="input-registo-email" placeholder="EMAIL">
+                <input name="email" class="form-input" type="email" id="input-registo-email" placeholder="EMAIL" required>
             </div>
-            <button id="btn-registo" type="button" class="btn">Register</button>
+            <button id="btn-registo" type="submit" class="btn">Register</button>
         </form>
 
     </div>
     <div id="login" style="display:none" class="tab-content">
 
-        <form id="form-login">
+        <form id="form-login" method="post" action="/login">
+            <input name="csrf_token" type="hidden"  value="{{ csrf_token() }}"/>
             <div class="form-group">
                 <label class="form-label" for="input-login-password">Username</label>
-                <input class="form-input" type="text" id="input-login-username" placeholder="Name">
+                <input name="username" class="form-input" type="text" id="input-login-username" placeholder="Name">
             </div>
 
             <div class="form-group">
                 <label class="form-label" for="input-login-password">Password</label>
-                <input class="form-input" type="password" id="input-login-password" placeholder="Password">
+                <input name="password"  class="form-input" type="password" id="input-login-password" placeholder="Password">
             </div>
-            <button id="btn-login" type="button" class="btn">Login</button>
+            <button id="btn-login" type="submit" class="btn">Login</button>
         </form>
 
     </div>

@@ -45,8 +45,8 @@ const IndexHelper = function () {
     //#region formulário
     //Inicializa o formulário, botões e ações
     const initForm = () => {
-        $('#btn-login').on('click', login);
-        $('#btn-registo').on('click', registo);
+        // $('#btn-login').on('click', login);
+        //$('#btn-registo').on('click', registo);
     }
 
     const login = function () {

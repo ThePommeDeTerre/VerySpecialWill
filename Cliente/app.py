@@ -1,7 +1,7 @@
 import time
 
 import jwt
-from flask import Flask, render_template, session, request, flash, send_file, redirect, url_for, g,escape
+from flask import Flask, render_template, session, request, flash, send_file, redirect, url_for, g, escape
 import secrets
 import helpers.SessionHelper as SessionHelper
 import helpers.CommonHellper as Common
@@ -11,25 +11,13 @@ import jwt
 
 # Este nao usem o pip para instalar, mas o gestor de packages do pycharm
 from flask_wtf.csrf import CSRFProtect, CSRFError
-from flask_mail import Mail
 from flask_qrcode import QRcode
-
 
 import email_test
 import requests
 
 app = Flask(__name__)
 qrcode = QRcode(app)
-
-# Configurações smtp para flask-email
-app.config['MAIL_SERVER'] = 'smtp.mailtrap.io'
-app.config['MAIL_PORT'] = 2525
-app.config['MAIL_USERNAME'] = 'ee8998e171334d'
-app.config['MAIL_DEFAULT_SENDER'] = 'ee8998e171334d'
-app.config['MAIL_PASSWORD'] = '674d5516a4c748'
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-mail = Mail(app)
 
 # Cria a secret key para a sessão e ativa proteção por csrf
 app.config["SECRET_KEY"] = secrets.token_urlsafe(16)
@@ -50,13 +38,14 @@ def main():
 def login():
     try:
         if request.method == 'POST':
-            params = request.get_json();
+            params = request.form.to_dict()
 
             # Fazer o trim dos fields e verificar se estao vazias
             params, valid = Common.trim_params(params)
 
             if not valid:
-                return Common.create_response_message(200, False, 'Por favor preencha todos os campos')
+                flash('Please fill all fields', "danger")
+                return redirect('/')
 
             url = SerRoutes.ROUTES['login']
             response = requests.post(url, json=params)
@@ -68,19 +57,25 @@ def login():
             # Tratamento da resposta
             response_params = response.json()
             if response_params['status'] == 'OK':
-                test = jwt.decode(response_params['jwt'], 'ThisIsMyKey', algorithms="HS256")
-                return Common.create_response_message(200, True)
+                session['user'] = {'2fa_logged': False}
+                session['jwt'] = response_params['jwt_token']
+                # test = jwt.decode(response_params['jwt_token'], 'ThisIsMyKey', algorithms="HS512")
+                flash("Good Job", "danger")
+                return redirect(url_for('login_2fa'))
             elif response_params['status'] == 'NOK':
-                return Common.create_response_message(200, False, response_params['message'])
+                flash(response_params['message'], "danger")
+                return redirect('/')
             else:
-                return Common.create_response_message(200, False, 'Ocorreu um erro, por favor contrate o suporte')
-
+                flash("An Error has occurred, please contact support", "error")
+                return redirect('/')
         else:
-            return Common.create_response_message(200, False, 'Ocorreu um erro')
+            flash("An Error has occurred, please contact support", "error")
+            return redirect('/')
 
     # Caso haja erros de status ou conexão
     except:
-        return Common.create_response_message(200, False, 'Ocorreu um erro')
+        flash("An Error has occurred, please contact support", "error")
+        return redirect('/')
 
 
 # Efetua o registo
@@ -88,13 +83,14 @@ def login():
 def registo():
     try:
         if request.method == 'POST':
-            params = request.get_json();
+            params = request.form.to_dict();
 
             # Fazer o trim dos fields e verificar se estao vazios
             params, valid = Common.trim_params(params)
 
             if not valid:
-                return Common.create_response_message(200, False, 'Por favor preencha todos os campos')
+                flash('Please fill all fields', "danger")
+                return redirect('/')
 
             url = SerRoutes.ROUTES['registo']
             response = requests.post(url, json=params)
@@ -106,17 +102,24 @@ def registo():
             # Tratamento da resposta
             response_params = response.json()
             if response_params['status'] == 'OK':
-                return Common.create_response_message(200, True)
+                flash("Good Job", "danger")
+                return redirect(url_for('login_2fa'))
             elif response_params['status'] == 'NOK':
-                return Common.create_response_message(200, False, response_params['message'])
+                flash(response_params['message'], "danger")
+                return redirect('/')
             else:
-                return Common.create_response_message(200, False, 'Ocorreu um erro, por favor contrate o suporte')
+                flash("An Error has occurred, please contact support", "error")
+                return redirect('/')
 
         else:
-            return Common.create_response_message(200, False, 'Ocorreu um erro')
+            flash("An Error has occurred, please contact support", "error")
+            return redirect('/')
+            # return Common.create_response_message(200, False, 'Ocorreu um erro')
     # Caso haja erros de status ou conexão
-    except:
-        return Common.create_response_message(200, False, 'Ocorreu um erro')
+    except Exception as e:
+        flash("An Error has occurred, please contact support", "error")
+        return redirect('/')
+        # return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 
 # endregion
@@ -128,7 +131,6 @@ def login_2fa():
         if request.method == 'POST':
             params = request.get_json();
         else:
-
             # ir buscar secret key do user, por enquanto usar random
             secret = pyotp.random_base32()
             uri = pyotp.totp.TOTP(secret).provisioning_uri(name='test@google.com', issuer_name='A Very Special Will')
@@ -140,6 +142,12 @@ def login_2fa():
         return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 
+@app.route('/login/cancel2fa', methods=['GET'])
+def cancel_2fa():
+    session.pop('user', None)
+    return redirect('/')
+
+
 @app.route("/qrcode", methods=["GET"])
 def get_qrcode():
     # please get /qrcode?data=<qrcode_data>
@@ -148,18 +156,7 @@ def get_qrcode():
 
 
 # endregion
-
-# region email
-# Tentativa de enviar email
-@app.route("/send-email", methods=['GET'])
-def send_email():
-    email_test.test_send(mail)
-
-
-# endregion
-
-
-@app.route('/createwill', methods=['POST','GET'])
+@app.route('/createwill', methods=['POST', 'GET'])
 def createwill():
     try:
         if request.method == 'POST':
@@ -170,19 +167,28 @@ def createwill():
     except:
         return Common.create_response_message(200, False, 'Ocorreu um erro')
 
+
 # region beforeRequest
 @app.before_request
 def before_request():
     request_guest_handpoints = ['login', 'registo', 'qrcode', 'main', 'sendemail', 'static']
-    g.user = None
-    # implementar função de teste de sessão
 
-    if False and (request.endpoint not in request_guest_handpoints):
+    if 'user' in session:
+        # os gets de css
+        if request.endpoint in ['static', 'cancel_2fa', 'logout'] or request.endpoint is None:
+            return
+
+        if not session['user']['2fa_logged'] and request.endpoint != 'login_2fa':
+            flash('Please Authenticate Using 2FA', 'success')
+            return redirect(url_for('login_2fa'))
+        else:
+            g.user = escape(session['user'])
+            return
+    elif request.endpoint not in request_guest_handpoints:
+        flash("Sem Acesso", "error")
         return redirect(url_for('main'))
     else:
-        g.user = {}
-        g.user['username'] = escape("Gunther")
-    return
+        return
 
 
 # endregion
@@ -191,7 +197,12 @@ def before_request():
 # Como é por ajax, mudo o primeiro parametro para json, e retorno uma mensagem de erro
 @app.errorhandler(CSRFError)
 def handle_csrf_error(e):
-    return Common.create_response_message(400, True, 'Csrf Inválido', {'CsrfError': True})
+    # caso seja ajax
+    if request.is_xhr:
+        return Common.create_response_message(400, True, 'Csrf Inválido', {'CsrfError': True})
+    else:
+        flash('Invalid Csrf Token', 'danger')
+        return redirect('/')
 
 
 # endregion
