@@ -89,7 +89,8 @@ def login_user():
         # returns the session token with the status and the 2fa token
         return jsonify({"jwt_token": generate_jwt_token(dataToEncode), 
                         "status": "OK", 
-                        "token_2fa": token_2fa})
+                        "token_2fa": token_2fa,
+                        "username" : user_name})
     
     else:
         message = {"status": "NOK", 
