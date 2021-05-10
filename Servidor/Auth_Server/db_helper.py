@@ -7,6 +7,7 @@ Here are defined the helper methods to communicate with the authetication databa
 
 from mysql.connector import MySQLConnection, Error
 from configparser import ConfigParser
+
 from utils import generate_hash
 
 class DBHelper:
@@ -104,3 +105,25 @@ class DBHelper:
             return True
         except:
             return False
+
+    """
+    Verify is 2FA for a given user is enabled and, if it is, the token is returned
+    """
+    def user_has_2fa(self, username):
+        
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+
+            cursor.execute("SELECT fa2_token FROM user_table WHERE username = %s" , (username,))
+
+            (value_2fa,) = cursor.fetchone()
+
+            if not value_2fa:
+                return "NOK"
+            else:
+                # convert to string
+                return value_2fa.decode()
+        
+        except Error as e:
+            print(e)
+            return "NOK"

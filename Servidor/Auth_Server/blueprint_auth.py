@@ -59,11 +59,16 @@ def login_user():
         # data to incorporate the message
         dataToEncode = {'user': user_name, 'exp': exp}
 
-        # returns the session token with the status
-        return jsonify({"jwt_token": generate_jwt_token(dataToEncode), "status": "OK"})
+        # check if the user has 2fa entry in the database and send the result
+        token_2fa = dbHelper.user_has_2fa(user_name)
+        # returns the session token with the status and the 2fa token
+        return jsonify({"jwt_token": generate_jwt_token(dataToEncode), 
+                        "status": "OK", 
+                        "token_2fa": token_2fa})
     
     else:
-        return jsonify({"status": "NOK", "message":"Invalid credentials"})
+        return jsonify({"status": "NOK", 
+                        "message":"Invalid credentials"})
         # UNAUTORIZED - credentials not valid
         # Response(status=401)
 
