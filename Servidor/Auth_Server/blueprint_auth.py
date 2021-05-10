@@ -4,7 +4,7 @@ Set up of Flask's Blueprint for the user's authentication
 
 import time
 
-from flask import (Blueprint, json,
+from flask import (Blueprint,
                   request, 
                   Response, 
                   jsonify,
