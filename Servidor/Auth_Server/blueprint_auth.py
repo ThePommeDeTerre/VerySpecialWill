@@ -32,6 +32,14 @@ Handle the user registration
 """
 @auth_blueprint.route("/register", methods=["POST"])
 def register_user():
+    """
+    Method to regist a new user
+    
+    :param: None
+    :return: 201 and the 2fa token if it has success
+             409 if the username is already in use
+             400 if it is not possible to process due to client error
+    """
 
     # get parameters
     username = get_from_json("username")
@@ -69,6 +77,14 @@ Handle the user login
 """
 @auth_blueprint.route("/login", methods=["POST"])
 def login_user():
+
+    """
+    Method to login an user
+
+    :param: None
+    :return: jwt, status, 2fa token and username if the credentials are valid
+             401 if the credentials are invalid             
+    """
 
     # get parameters
     user_name = get_from_json("username")
