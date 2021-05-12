@@ -2,13 +2,12 @@
 Set up of Flask's Blueprint for the user's authentication
 """
 
-import time
-
-from flask import (Blueprint,
-                  request, 
-                  Response, 
-                  jsonify,
-                  make_response
+from flask import (
+    Blueprint,
+    request, 
+    Response, 
+    jsonify,
+    make_response
 )
 
 from utils import (
@@ -17,19 +16,20 @@ from utils import (
     generate_hash,
     generate_jwt_token
 )
+
+import time
 import db_helper as helper
 dbHelper = helper.DBHelper()
 
 
 auth_blueprint = Blueprint('auth', __name__,)
+"""
 @auth_blueprint.route('/', methods=["GET"])
 def this_main():
     return 'baaahh'
+"""
 
 
-"""
-Handle the user registration
-"""
 @auth_blueprint.route("/register", methods=["POST"])
 def register_user():
     """
@@ -72,9 +72,7 @@ def register_user():
         # 400: Fail - Server can't process due to client error 
         return Response(status=400)
 
-"""
-Handle the user login
-"""
+
 @auth_blueprint.route("/login", methods=["POST"])
 def login_user():
 
@@ -115,6 +113,9 @@ def login_user():
         # 401 - UNAUTORIZED - credentials not valid
         return make_response(jsonify(message), 401)
 
-# internal function
+
 def get_from_json(JSONKey):
+    """
+    Get the parameter from json 
+    """    
     return request.get_json()[JSONKey]

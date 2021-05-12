@@ -14,14 +14,25 @@ class DBHelper:
     dbConnection = None
 
     def __init__(self, filename='config.ini', section='mysql'):
+
+        """
+        Create the object
+        """
+
         db_config = self.read_db_config(filename, section)
         
         self.dbConnection = MySQLConnection(**db_config) # If we cannot connect let it crash
 
-    """
-    Get the database configuration
-    """
+
     def read_db_config(self, filename, section):
+
+        """
+        Get the database
+        :param filename: name of the file where the configuration shoud the read
+        :param section: database configuration 
+        :return: a dictionary of database parameters
+        """
+
         # create parser and read ini configuration file
         parser = ConfigParser()
         parser.read(filename)
@@ -37,10 +48,13 @@ class DBHelper:
 
         return db
 
-    """
-    Helper method to iterate over the rows of the table
-    """
+
     def iter_row(self, cursor, size=10):
+
+        """
+        Helper method to iterate over the rows of the table
+        """
+
         while True:
             rows = cursor.fetchmany(size)
             if not rows:
@@ -48,25 +62,13 @@ class DBHelper:
             for row in rows:
                 yield row
 
-    """
-    Get all data from the table
-    """
-    def query_with_fetchmany(self):
-        try:
-            cursor = self.dbConnection.cursor(prepared=True)
-
-            cursor.execute("SELECT * FROM user_table")
-
-            for row in self.iter_row(cursor, 10):
-                print(row)
-
-        except Error as e:
-            print(e)
-
-    """
-    Verify is a given user is in the database
-    """
+    
     def verify_user(self, username, password):
+    
+        """
+        Verify is a given user is in the database
+        """
+
         try:
             cursor = self.dbConnection.cursor(prepared=True)
 
@@ -88,10 +90,12 @@ class DBHelper:
             print(e)
             return False
 
-    """
-    Insert one single user
-    """
+
     def insert_user(self, username, mail, pwd_salt, pwd_hash):
+
+        """
+        Insert one single user
+        """
 
         query = "INSERT INTO user_table(username, mail, pwd_salt, pwd_hash) " \
                 "VALUES(%s,%s,%s,%s)"
@@ -106,18 +110,22 @@ class DBHelper:
         except:
             return False
 
-    """
-    Verify is 2FA for a given user is enabled and, if it is, the token is returned
-    """
+
     def user_has_2fa(self, username):
-        
+
+        """
+        Verify is 2FA for a given user is enabled and, if it is, the token is returned
+        """
+
         try:
             cursor = self.dbConnection.cursor(prepared=True)
 
             cursor.execute("SELECT fa2_token FROM user_table WHERE username = %s" , (username,))
 
+            # get the returned tuple
             (value_2fa,) = cursor.fetchone()
 
+            # is is none then there is no matches
             if not value_2fa:
                 return "NOK"
             else:
