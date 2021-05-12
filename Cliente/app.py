@@ -1,13 +1,10 @@
-import time
-
-import jwt
 from flask import Flask, render_template, session, request, flash, send_file, redirect, url_for, g, escape
 import secrets
 import helpers.SessionHelper as SessionHelper
 import helpers.CommonHellper as Common
 import static.ServerRoutes as SerRoutes
 import pyotp
-import jwt
+import os
 
 # Este nao usem o pip para instalar, mas o gestor de packages do pycharm
 from flask_wtf.csrf import CSRFProtect, CSRFError
@@ -181,7 +178,7 @@ def createwill():
 # region beforeRequest
 @app.before_request
 def before_request():
-    request_guest_handpoints = ['login', 'registo', 'qrcode', 'main', 'sendemail', 'static']
+    request_guest_handpoints = ['login', 'registo', 'qrcode', 'main', 'sendemail', 'static','createwill']
 
     if 'user' in session:
         g.user = session['user']
@@ -220,6 +217,7 @@ def handle_csrf_error(e):
 # endregion
 
 if __name__ == '__main__':
-    app.run()
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    app.run(ssl_context=(dir_path + '/cert.pem', dir_path + '/key.pem'))
 
 # response = requests.get("http://149.90.108.93:80")

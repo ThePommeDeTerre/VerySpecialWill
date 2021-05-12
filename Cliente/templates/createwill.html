@@ -9,38 +9,31 @@
     <form>
         <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
 
-        <h5 class="s-subtitle mt-2"id="forms-input">Will Specification</h5>
+        <h5 class="s-subtitle mt-2" id="forms-input">Will Specification</h5>
 
         <div class="columns">
-            <div class="column col-6">
+            <div class="column col-4">
                 <div class="form-group">
                     {#Tipo de Cifra#}
                     <label class="form-label" for="input-cypher_type">Cypher Type</label>
-                    <select name="cypher_type" id="input-cypher_type" class="form-select" placeholder="Cypher Type">
+                    <select name="cypher_type" id="input-cypher_type" class="form-select" placeholder="Cypher Type" required>
                         <option value="1">AES-128-CBC</option>
                     </select>
 
                     {#Number of Shares#}
                     <label class="form-label" for="input-number_of_shares">Number of Shares</label>
                     <input id="input-number_of_shares" name="number_of_shares" type="number" class="form-input"
-                           placeholder="Number of Shares">
+                           placeholder="Number of Shares" required>
 
-                    {#Hash Function#}
-                    <label class="form-label" for="input-hash_function">Hash Function</label>
-                    <select name="hash_function" id="input-hash_function" class="form-select"
-                            placeholder="Hash Function">
-                        <option value="1">SHA256</option>
-                        <option value="2">SHA512</option>
-                    </select>
                 </div>
             </div>
 
-            <div class="column col-6">
+            <div class="column col-4">
                 <div class="form-group">
                     {#Confidential Level#}
                     <label class="form-label" for="input-confidential_level">Confidential Level</label>
                     <select name="confidential_level" id="input-confidential_level" class="form-select"
-                            placeholder="Confidential Level">
+                            placeholder="Confidential Level" required>
                         <option value="1">Secrets kept by server</option>
                         <option value="2">Secrets sent to users</option>
                     </select>
@@ -48,8 +41,18 @@
                     {#Minimum Shares Needed#}
                     <label class="form-label" for="input-minimum_shares">Minimum Shares Needed</label>
                     <input id="input-minimum_shares" name="minimum_shares" type="number" class="form-input"
-                           placeholder="Minimum Shares Needed">
+                           placeholder="Minimum Shares Needed" required>
                 </div>
+            </div>
+
+            <div class="column col-4">
+                {#Hash Function#}
+                <label class="form-label" for="input-hash_function">Hash Function</label>
+                <select name="hash_function" id="input-hash_function" class="form-select"
+                        placeholder="Hash Function" required>
+                    <option value="1">SHA256</option>
+                    <option value="2">SHA512</option>
+                </select>
             </div>
         </div>
 
@@ -57,17 +60,51 @@
 
         <h5 class="s-subtitle mt-2" id="forms-input">Add Users</h5>
         <div class="columns mt-2">
-            <div class="column col-6">
+            <div class="column col-4">
                 <div class="form-group">
                     {#Users to Add#}
                     <label class="form-label" for="input-confidential_level">Users to Add</label>
-                    <input id="input-user_to_add" name="user_to_add" type="email" class="form-input" placeholder="User To Add">
+                    <input id="input-user_to_add" name="user_to_add" type="email" class="form-input"
+                           placeholder="User To Add">
 
-                    <select multiple  id="input-user_multiple" name="user_to_add[]" style="display: none"></select>
+                    <select multiple id="input-user_multiple" name="user_to_add[]" style="display: none"></select>
                 </div>
             </div>
             <div class="text-right column col-2 col-ml-auto" style="align-self:flex-end">
-                <button type="button" id="btn-add-user" class="btn btn-success"><i class="fas fa-plus"></i> Add User</button>
+                <button type="button" id="btn-add-user" class="btn btn-success"><i class="fas fa-plus"></i> Add User
+                </button>
+            </div>
+        </div>
+        <div class="columns">
+            <div class="column col-12">
+                <table id="users-table" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th width="90%">Email</th>
+                        <th width="10%">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+        <h5 class="s-subtitle mt-2" id="forms-input">The Will</h5>
+        <div class="columns">
+            <div class="column col-12">
+                {#Your Special Will#}
+                <label class="form-label" for="input-special_will">Your Special Will</label>
+                <textarea id="input-special_will" name="special_will" class="form-input" placeholder="Your Special Will"
+                          rows="3" required></textarea>
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column col-12 text-right">
+                <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Submit the Will
+                </button>
             </div>
         </div>
 
