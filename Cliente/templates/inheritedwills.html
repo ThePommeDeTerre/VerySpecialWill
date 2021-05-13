@@ -1,0 +1,35 @@
+{% extends 'layout/main.html' %}
+
+
+{% block title %}
+    Inherited Will
+{% endblock %}
+
+{% block content %}
+    <div class="columns">
+        <div class="column col-12">
+            <table id="users-table" class="table table-striped">
+                <thead>
+                <tr>
+                    <th width="20%">Owner</th>
+                    <th width="20%">Active</th>
+                    <th width="20%">Secrets</th>
+                    <th width="20%">Timeout</th>
+                    <th width="20%">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for will in wills_list %}
+                    <td>{{ will[1] }}</td>
+                    <td>{{ will[2] }}</td>
+                    <td>{{ will[3] }}</td>
+                    <td>{{ will[4] }}</td>
+                    <td><a href="createwill" type="button" class="btn btn-primary" data-value="{{ will[0] }}">Join Will</a></td>
+                </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
