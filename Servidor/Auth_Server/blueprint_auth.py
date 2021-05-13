@@ -2,13 +2,12 @@
 Set up of Flask's Blueprint for the user's authentication
 """
 
-import time
-
-from flask import (Blueprint,
-                  request, 
-                  Response, 
-                  jsonify,
-                  make_response
+from flask import (
+    Blueprint,
+    request, 
+    Response, 
+    jsonify,
+    make_response
 )
 
 from utils import (
@@ -17,21 +16,30 @@ from utils import (
     generate_hash,
     generate_jwt_token
 )
+
+import time
 import db_helper as helper
 dbHelper = helper.DBHelper()
 
 
 auth_blueprint = Blueprint('auth', __name__,)
+"""
 @auth_blueprint.route('/', methods=["GET"])
 def this_main():
     return 'baaahh'
+"""
 
 
-"""
-Handle the user registration
-"""
 @auth_blueprint.route("/register", methods=["POST"])
 def register_user():
+    """
+    Method to regist a new user
+    
+    :param: None
+    :return: 201 and the 2fa token if it has success
+             409 if the username is already in use
+             400 if it is not possible to process due to client error
+    """
 
     # get parameters
     username = get_from_json("username")
@@ -64,11 +72,17 @@ def register_user():
         # 400: Fail - Server can't process due to client error 
         return Response(status=400)
 
-"""
-Handle the user login
-"""
+
 @auth_blueprint.route("/login", methods=["POST"])
 def login_user():
+
+    """
+    Method to login an user
+
+    :param: None
+    :return: jwt, status, 2fa token and username if the credentials are valid
+             401 if the credentials are invalid             
+    """
 
     # get parameters
     user_name = get_from_json("username")
@@ -99,6 +113,9 @@ def login_user():
         # 401 - UNAUTORIZED - credentials not valid
         return make_response(jsonify(message), 401)
 
-# internal function
+
 def get_from_json(JSONKey):
+    """
+    Get the parameter from json 
+    """    
     return request.get_json()[JSONKey]
