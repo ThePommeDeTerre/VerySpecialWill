@@ -163,6 +163,7 @@ def get_qrcode():
 
 
 # endregion
+
 @app.route('/createwill', methods=['POST', 'GET'])
 def createwill():
     try:
@@ -175,10 +176,34 @@ def createwill():
         return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 
+@app.route('/inheritedwills', methods=['POST', 'GET'])
+def inheritedwills():
+    try:
+        if request.method == 'POST':
+            teste = 1
+        else:
+            # for testing
+            wills_list = [[1,'<script>alert("ola")</script>', 1, '10/20', '5:00'],
+                          [2, 'Sou Eu', 1, '5/10', '5:00'],
+                          [3, 'Maria Dos Xutos e Pontapés', 1, '15/20', '4:00'],
+                          [4, 'Cristina Ferreira', 1, '200/20000', '3:00'],
+                          ]
+            wills_list = Common.sanitize_rows(wills_list)
+
+            return render_template('inheritedwills.html', wills_list=wills_list)
+    # Caso haja erros de status ou conexão
+    except Exception as e:
+        return Common.create_response_message(200, False, 'Ocorreu um erro')
+
+
 # region beforeRequest
 @app.before_request
 def before_request():
-    request_guest_handpoints = ['login', 'registo', 'qrcode', 'main', 'sendemail', 'static','createwill']
+    request_guest_handpoints = ['login', 'registo', 'qrcode', 'main', 'sendemail', 'static']
+
+    # for testing
+    request_guest_handpoints.append('createwill')
+    request_guest_handpoints.append('inheritedwills')
 
     if 'user' in session:
         g.user = session['user']

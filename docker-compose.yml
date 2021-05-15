@@ -86,6 +86,8 @@ services:
       - '5007:80'
     volumes: 
       - ./Servidor/Service_Server:/app
+    environment:   
+      JWT_SECRET_KEY: ThisIsMyKey
     networks:
       backend:
         ipv4_address: 172.20.1.5
