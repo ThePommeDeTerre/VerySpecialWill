@@ -30,10 +30,11 @@ def generate_hash(plain_password, password_salt):
         10000,
     )
     return password_hash.hex()
-"""
-Generate a JWT to respond to the user
-"""
+
 def generate_jwt_token(message):
+    """
+    Generate a JWT to respond to the user
+    """
     # enconde data
     encoded_content = jwt.encode(message, JWT_SECRET_KEY, algorithm="HS512")
     token = str(encoded_content).split("'")[1]

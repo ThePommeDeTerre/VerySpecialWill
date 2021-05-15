@@ -17,11 +17,11 @@ class DBHelper:
         db_config = self.read_db_config(filename, section)
         
         self.dbConnection = MySQLConnection(**db_config) # If we cannot connect let it crash
-
-    """
-    Get the database configuration
-    """
+    
     def read_db_config(self, filename, section):
+        """
+        Get the database configuration
+        """
         # create parser and read ini configuration file
         parser = ConfigParser()
         parser.read(filename)
@@ -37,10 +37,10 @@ class DBHelper:
 
         return db
 
-    """
-    Helper method to iterate over the rows of the table
-    """
     def iter_row(self, cursor, size=10):
+        """
+        Helper method to iterate over the rows of the table
+        """
         while True:
             rows = cursor.fetchmany(size)
             if not rows:
@@ -48,10 +48,10 @@ class DBHelper:
             for row in rows:
                 yield row
 
-    """
-    Get all data from the table
-    """
     def query_with_fetchmany(self):
+        """
+        Get all data from the table
+        """
         try:
             cursor = self.dbConnection.cursor(prepared=True)
 
@@ -63,10 +63,10 @@ class DBHelper:
         except Error as e:
             print(e)
 
-    """
-    Verify is a given user is in the database
-    """
     def verify_user(self, username, password):
+        """
+        Verify is a given user is in the database
+        """
         try:
             cursor = self.dbConnection.cursor(prepared=True)
 
@@ -88,10 +88,10 @@ class DBHelper:
             print(e)
             return False
 
-    """
-    Insert one single user
-    """
     def insert_user(self, username, mail, pwd_salt, pwd_hash):
+        """
+        Insert one single user
+        """
 
         query = "INSERT INTO user_table(username, mail, pwd_salt, pwd_hash) " \
                 "VALUES(%s,%s,%s,%s)"
@@ -106,10 +106,10 @@ class DBHelper:
         except:
             return False
 
-    """
-    Verify is 2FA for a given user is enabled and, if it is, the token is returned
-    """
     def user_has_2fa(self, username):
+        """
+        Verify is 2FA for a given user is enabled and, if it is, the token is returned
+        """
         
         try:
             cursor = self.dbConnection.cursor(prepared=True)
