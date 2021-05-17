@@ -14,8 +14,6 @@ from mysql.connector.cursor import CursorBase
 
 import auth_db_helper as helper_auth
 
-dbHelper_auth = helper_auth.DBHelper_auth()
-
 class DBHelper_service:
     dbConnection = None
 
@@ -23,6 +21,10 @@ class DBHelper_service:
         db_config = self.read_db_config_service(filename, section)
         
         self.dbConnection = MySQLConnection(**db_config) # If we cannot connect let it crash
+
+
+    def close(self):
+        self.dbConnection.close()
 
 
     def read_db_config_service(self, filename, section):
@@ -72,7 +74,7 @@ class DBHelper_service:
         """
 
         try:
-            cursor = self.dbConnection.cursor()
+            cursor = self.dbConnection.cursor(buffered=True)
             result = cursor.execute("SELECT service_username FROM service_user WHERE service_username = %s" , (username, ))
            
             cursor.close()
@@ -95,7 +97,7 @@ class DBHelper_service:
         """
 
         try:
-            cursor = self.dbConnection.cursor()
+            cursor = self.dbConnection.cursor(buffered=True)
             cursor.execute("INSERT IGNORE INTO service_user (service_username) VALUES (%s)", (username, ))
 
             self.dbConnection.commit()
@@ -116,7 +118,10 @@ class DBHelper_service:
         """
 
         try:
+            dbHelper_auth = helper_auth.DBHelper_auth()
             usernames_auth = dbHelper_auth.get_all_usernames_authentication()
+
+            dbHelper_auth.close()
 
             if not usernames_auth:
                 return False

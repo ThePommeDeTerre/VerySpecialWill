@@ -22,6 +22,10 @@ class DBHelper_auth:
         self.dbConnection = MySQLConnection(**db_config) 
 
 
+    def close(self):
+        self.dbConnection.close()
+
+
     def read_db_config_auth(self, filename, section):
         
         """
@@ -71,7 +75,7 @@ class DBHelper_auth:
         list_all_usernames = []
         
         try:
-            cursor = self.dbConnection.cursor(prepared=True)
+            cursor = self.dbConnection.cursor(buffered=True)
 
             cursor.execute("SELECT username FROM user_table")
 

@@ -24,6 +24,10 @@ class DBHelper:
         self.dbConnection = MySQLConnection(**db_config) # If we cannot connect let it crash
 
 
+    def close(self):
+        self.dbConnection.close()
+
+
     def read_db_config(self, filename, section):
 
         """

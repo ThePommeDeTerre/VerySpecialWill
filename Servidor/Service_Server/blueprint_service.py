@@ -19,9 +19,7 @@ from utils_service import (
 
 import service_db_helper as helper_service
 
-dbHelper = helper_service.DBHelper_service()
 service_blueprint = Blueprint('service', __name__,)
-
 
 @service_blueprint.route("/create", methods=["POST"])
 def create_will():
@@ -44,9 +42,16 @@ def create_will():
 
 
     # populate database
-    if not dbHelper.populate_service_with_auth():
+    dbHelper = helper_service.DBHelper_service()
+
+    if dbHelper.populate_service_with_auth():
+        message = {"status": "OK"}
+
         # created
-        return Response(status=201)
+        dbHelper.close()
+        return jsonify(message)
+    else:
+        print("Erro")
 
     # TODO : continue this - get the message, the people to give keys ...
 

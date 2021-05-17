@@ -19,8 +19,6 @@ from utils import (
 
 import time
 import db_helper as helper
-dbHelper = helper.DBHelper()
-
 
 auth_blueprint = Blueprint('auth', __name__,)
 
@@ -35,6 +33,8 @@ def register_user():
              409 if the username is already in use
              400 if it is not possible to process due to client error
     """
+
+    dbHelper = helper.DBHelper()
 
     # get parameters
     username = get_from_json("username")
@@ -57,13 +57,14 @@ def register_user():
             message = {"token_2fa": is_2fa_enabled}
 
             # 201: Success - Created 
+            dbHelper.close()
             return jsonify(message)
         else:
-
+            dbHelper.close()
             # 409: Fail - Conflit between the current state of the target 
             return Response(status=409)
     else:
-
+        dbHelper.close()
         # 400: Fail - Server can't process due to client error 
         return Response(status=400)
 
@@ -78,6 +79,8 @@ def login_user():
     :return: jwt, status, 2fa token and username if the credentials are valid
              401 if the credentials are invalid             
     """
+
+    dbHelper = helper.DBHelper()
 
     # get parameters
     user_name = get_from_json("username")
@@ -95,6 +98,8 @@ def login_user():
         # check if the user has 2fa entry in the database and send the result
         token_2fa = dbHelper.user_has_2fa(user_name)
 
+        dbHelper.close()
+
         # returns the session token with the status and the 2fa token
         return jsonify({"jwt_token": generate_jwt_token(dataToEncode), 
                         "status": "OK", 
@@ -104,6 +109,8 @@ def login_user():
     else:
         message = {"status": "NOK", 
                    "message":"Invalid credentials"}
+
+        dbHelper.close()
 
         # 401 - UNAUTORIZED - credentials not valid
         return make_response(jsonify(message), 401)
