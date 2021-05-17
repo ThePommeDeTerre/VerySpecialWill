@@ -12,6 +12,6 @@ CREATE TABLE user_table (
     fa2_token VARCHAR(32),
     pwd_salt VARCHAR(150) NOT NULL,
     pwd_hash VARCHAR(150) NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
     PRIMARY KEY (username)
 );

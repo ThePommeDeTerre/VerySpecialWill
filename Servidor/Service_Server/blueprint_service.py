@@ -18,11 +18,11 @@ from utils_service import (
 
 import service_db_helper as helper_service
 
-dbHelper = helper.DBHelper_service()
+dbHelper = helper_service.DBHelper_service()
 service_blueprint = Blueprint('service', __name__,)
 
 
-@auth_blueprint.route("/create", methods=["POST"])
+@service_blueprint.route("/create", methods=["POST"])
 def create_will():
     """
     Method to create a will

@@ -19,7 +19,7 @@ CREATE TABLE service_user (
 DROP TABLE IF EXISTS share_key 
 
 CREATE TABLE share_key(
-    key_id INT(10) NOT NULL AUTO_INCREMENT
+    key_id INT(10) NOT NULL AUTO_INCREMENT,
     value_of_key VARCHAR(150) NOT NULL,
     PRIMARY KEY key_id
 );

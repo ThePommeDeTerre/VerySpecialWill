@@ -11,7 +11,7 @@ class DBHelper_service:
     dbConnection = None
 
     def __init__(self, filename='config_service.ini', section='mysql'):
-        db_config = self.read_db_config(filename, section)
+        db_config = self.read_db_config_service(filename, section)
         
         self.dbConnection = MySQLConnection(**db_config) # If we cannot connect let it crash
 

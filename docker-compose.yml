@@ -21,6 +21,8 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
       MYSQL_DATABASE: auth_DB
+    ports:
+        - '3306:3306'
     volumes:
       - auth_db:/var/lib/mysql                  # data will be persisted here
       - ./Databases/auth_database.sql:/docker-entrypoint-initdb.d/auth_database.sql
@@ -46,7 +48,7 @@ services:
     container_name: auth_flask_server
     build: 
       context: .
-      dockerfile: ./Auth_Server/Dockerfile
+      dockerfile: ./Servidor/Auth_Server/Dockerfile
     ports:
       - '5005:80'
     volumes: 
