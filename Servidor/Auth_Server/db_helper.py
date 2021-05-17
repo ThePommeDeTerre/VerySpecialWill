@@ -80,9 +80,9 @@ class DBHelper:
                 return False
 
             (salt, hash) = record
-            
-            pwd_hash = generate_hash(password, salt.decode())
-            if hash.decode() == pwd_hash:
+
+            pwd_hash = generate_hash(password, salt)
+            if hash == pwd_hash:
                 return True
             else:
                 return False

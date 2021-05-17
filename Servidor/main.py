@@ -38,10 +38,6 @@ def to_service_server(allowed_paths):
     # 301 - Moved Permanently     
     return redirect("http://149.90.108.93:5007/service/", code=301)
 
-@app.route('/')
-def run():
-    return render_template('index.html')
-
 
 if __name__ == '__main__':
     app.debug=True
