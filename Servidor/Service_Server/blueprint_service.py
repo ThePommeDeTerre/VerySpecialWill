@@ -11,6 +11,7 @@ from flask import (
 )
 
 from flask.json import jsonify
+from flask.wrappers import Response
 
 from utils_service import (
     get_jwt_data
@@ -24,6 +25,7 @@ service_blueprint = Blueprint('service', __name__,)
 
 @service_blueprint.route("/create", methods=["POST"])
 def create_will():
+
     """
     Method to create a will
     """
@@ -38,11 +40,18 @@ def create_will():
         message = {"status": "NOK",
                    "message": "Invalid Token"}
         # 401 - UNAUTHORIZED - session token doesn't authorize the user anymore
-        return make_response(jsonify(message), 401)
+        return jsonify(message)
+
+
+    # populate database
+    if not dbHelper.populate_service_with_auth():
+        # created
+        return Response(status=201)
 
     # TODO : continue this - get the message, the people to give keys ...
 
 def get_from_json(JSONKey):
+
     """
     Get the parameter from json 
     """

@@ -16,12 +16,12 @@ CREATE TABLE service_user (
 
 /* ---  KEY TABLE ---*/
 
-DROP TABLE IF EXISTS share_key 
+DROP TABLE IF EXISTS share_key;
 
 CREATE TABLE share_key(
     key_id INT(10) NOT NULL AUTO_INCREMENT,
     value_of_key VARCHAR(150) NOT NULL,
-    PRIMARY KEY key_id
+    PRIMARY KEY (key_id)
 );
 
 /* ---  WILL TABLE ---*/
@@ -50,7 +50,7 @@ CREATE TABLE user_share (
     key_id_share INT(10) NOT NULL,
     will_id_share INT(10) NOT NULL,
     PRIMARY KEY (username_share, key_id_share),
-    FOREIGN KEY (username)
+    FOREIGN KEY (username_share)
         REFERENCES service_user (service_username),
     FOREIGN KEY (key_id_share)
         REFERENCES share_key (key_id),

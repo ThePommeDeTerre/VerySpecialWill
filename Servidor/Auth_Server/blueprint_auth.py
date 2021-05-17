@@ -23,15 +23,10 @@ dbHelper = helper.DBHelper()
 
 
 auth_blueprint = Blueprint('auth', __name__,)
-"""
-@auth_blueprint.route('/', methods=["GET"])
-def this_main():
-    return 'baaahh'
-"""
-
 
 @auth_blueprint.route("/register", methods=["POST"])
 def register_user():
+
     """
     Method to regist a new user
     

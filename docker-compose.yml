@@ -21,8 +21,6 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
       MYSQL_DATABASE: auth_DB
-    ports:
-        - '3306:3306'
     volumes:
       - auth_db:/var/lib/mysql                  # data will be persisted here
       - ./Databases/auth_database.sql:/docker-entrypoint-initdb.d/auth_database.sql
@@ -32,8 +30,8 @@ services:
     cap_add:                                    # handle the ```mbind: Operation not permitted``` error softly
       - SYS_NICE
 
-  auth_adminer:
-    container_name: adminer_for_auth
+  adminer:
+    container_name: adminer
     image: adminer
     restart: always
     ports:

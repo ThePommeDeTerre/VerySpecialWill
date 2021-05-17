@@ -16,7 +16,7 @@ class DBHelper_auth:
         Initialize object with reading the configuration
         """
         
-        db_config = self.read_db_config(filename, section)
+        db_config = self.read_db_config_auth(filename, section)
         
         # If we cannot connect let it crash
         self.dbConnection = MySQLConnection(**db_config) 
@@ -65,7 +65,10 @@ class DBHelper_auth:
    
         """
         Get all the usernames in the user_table
+        :return: List with the usernames (string) in the authentication database
         """
+
+        list_all_usernames = []
         
         try:
             cursor = self.dbConnection.cursor(prepared=True)
@@ -73,7 +76,14 @@ class DBHelper_auth:
             cursor.execute("SELECT username FROM user_table")
 
             for row in self.iter_row(cursor, 10):
-                print(row)
+                (a, ) = row
+                if not a:
+                    break
+
+                list_all_usernames.append(a)
+
+            # return the list with all the availabe usernames
+            return list_all_usernames
 
         except Error as e:
             print(e)

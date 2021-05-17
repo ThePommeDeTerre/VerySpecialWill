@@ -4,8 +4,17 @@ Auxiliar methods to handle the Service Database
 
 """
 
+from os import name
+from dotenv.main import with_warn_for_invalid_lines
 from mysql.connector import MySQLConnection, Error
 from configparser import ConfigParser
+from mysql.connector import cursor
+
+from mysql.connector.cursor import CursorBase
+
+import auth_db_helper as helper_auth
+
+dbHelper_auth = helper_auth.DBHelper_auth()
 
 class DBHelper_service:
     dbConnection = None
@@ -40,6 +49,7 @@ class DBHelper_service:
 
         return db
 
+
     def iter_row(self, cursor, size=10):
 
         """
@@ -52,3 +62,73 @@ class DBHelper_service:
                 break
             for row in rows:
                 yield row
+
+            
+    def check_if_user_exists(self, username):
+
+        """
+        Given the name of a user, we check if he already exists
+        :param username: string
+        """
+
+        try:
+            cursor = self.dbConnection.cursor()
+            result = cursor.execute("SELECT service_username FROM service_user WHERE service_username = %s" , (username, ))
+           
+            cursor.close()
+
+            if not result:
+                return False
+
+            return True
+
+        except Error as e:
+            print(e)
+            return False
+
+
+    def insert_username(self, username):
+        
+        """
+        Insert one single username
+        :return: boolean depending on whether the operation is successful
+        """
+
+        try:
+            cursor = self.dbConnection.cursor()
+            cursor.execute("INSERT IGNORE INTO service_user (service_username) VALUES (%s)", (username, ))
+
+            self.dbConnection.commit()
+            cursor.close()
+            return True
+
+        except Error as e:
+            print(e)
+            return False
+
+
+
+    def populate_service_with_auth(self):
+
+        """
+        Get the usernames from the authentication database and insert them in the service database
+        :return: boolean depending on whether the operation is successful
+        """
+
+        try:
+            usernames_auth = dbHelper_auth.get_all_usernames_authentication()
+
+            if not usernames_auth:
+                return False
+
+            for i in usernames_auth:
+                if not self.check_if_user_exists(i):
+                    self.insert_username(i)
+                else:
+                    continue        
+
+            return True
+
+        except Error as e:
+            print(e)
+            return False

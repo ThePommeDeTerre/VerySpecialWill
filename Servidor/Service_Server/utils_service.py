@@ -4,11 +4,10 @@ Auxiliar file with calculations
 
 """
 
-from json import load
+from dotenv import load_dotenv
 
 import jwt
 import os
-import auth_db_helper as helper_auth
 
 def get_jwt_data(token):
 
@@ -23,7 +22,7 @@ def get_jwt_data(token):
 
     # decode
     try:
-        load.dotenv()
+        load_dotenv()
         data = jwt.decode(token, os.getenv("JWT_SECRET_KEY"), algorithm="HS512")
 
         return data
@@ -32,5 +31,3 @@ def get_jwt_data(token):
     except jwt.ExpiredSignatureError as error:
         print(error)
         return data
-
-# TODO: get usernames from the authentication database, acho

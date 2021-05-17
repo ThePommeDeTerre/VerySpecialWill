@@ -83,8 +83,10 @@ class DBHelper:
 
             pwd_hash = generate_hash(password, salt)
             if hash == pwd_hash:
+                cursor.close()
                 return True
             else:
+                cursor.close()
                 return False
         except Error as e:
             print(e)
@@ -94,11 +96,7 @@ class DBHelper:
         """
         Insert one single user
         """
-
-        """
-        Insert one single user
-        """
-
+        
         query = "INSERT INTO user_table(username, mail, pwd_salt, pwd_hash) " \
                 "VALUES(%s,%s,%s,%s)"
         args = (username, mail, pwd_salt, pwd_hash)
@@ -129,8 +127,10 @@ class DBHelper:
 
             # is is none then there is no matches
             if not value_2fa:
+                cursor.close()
                 return "NOK"
             else:
+                cursor.close()
                 # convert to string
                 return value_2fa.decode()
         
