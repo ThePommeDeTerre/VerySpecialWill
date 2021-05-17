@@ -11,9 +11,6 @@ app = Flask(__name__)
 
 app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    return render_template('index.html')
 
 if __name__ == '__main__':
     app.debug=True
