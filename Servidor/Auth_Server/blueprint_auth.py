@@ -62,7 +62,7 @@ def register_user():
             message = {"token_2fa": is_2fa_enabled}
 
             # 201: Success - Created 
-            return make_response(jsonify(message), 201)
+            return jsonify(message)
         else:
 
             # 409: Fail - Conflit between the current state of the target 

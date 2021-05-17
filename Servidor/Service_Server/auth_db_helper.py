@@ -18,7 +18,8 @@ class DBHelper_auth:
         
         db_config = self.read_db_config(filename, section)
         
-        self.dbConnection = MySQLConnection(**db_config) # If we cannot connect let it crash
+        # If we cannot connect let it crash
+        self.dbConnection = MySQLConnection(**db_config) 
 
 
     def read_db_config_auth(self, filename, section):
