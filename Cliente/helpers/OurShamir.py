@@ -1,6 +1,6 @@
 from Crypto.Protocol.SecretSharing import Shamir
 from OurHMAC import OurHMAC, HMACVerificationError
-from typing import List
+from typing import List, Tuple
 
 
 class OurShamir:
@@ -14,7 +14,7 @@ class OurShamir:
     """
 
     @classmethod
-    def split_secret(cls, min_shares: int, n: int, key: bytes) -> List[(int, bytes)]:
+    def split_secret(cls, min_shares: int, n: int, key: bytes) -> List[Tuple[int, bytes]]:
         """
         Split a secret into n shares.
         The secret can be reconstructed later using just k shares out of the original n.
