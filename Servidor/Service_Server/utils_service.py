@@ -47,6 +47,14 @@ def is_jwt_valid(jwt_token):
     :return: message/data , valid
     """
 
+    if not bool(jwt_token.spli()):
+        message = {"status": "NOK",
+                   "message": "Invalid Token"}
+
+        # 401 - UNAUTHORIZED - session token doesn't authorize the user anymore
+        return jsonify(message), False
+
+
     # verify token
     jwt_data = get_jwt_data(jwt_token)
 
