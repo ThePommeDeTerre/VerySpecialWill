@@ -130,7 +130,7 @@ def registo():
 # endregion
 
 # region 2fa
-@app.route('/login/2fa', methods=['GET','POST'])
+@app.route('/login/2fa', methods=['GET', 'POST'])
 def login_2fa():
     try:
         if request.method == 'POST':
@@ -144,8 +144,21 @@ def login_2fa():
             params['jwt_token'] = session['user']['jwt_token']
             url = SerRoutes.ROUTES['login_2fa']
             response = requests.post(url, json=params)
-            teste = 1
-            return redirect('/')
+
+            # Caso a resposta nao seja ok
+            if response.status_code != 200:
+                raise Exception()
+
+            # Tratamento da resposta
+            response_params = response.json()
+            if response_params['status'] == 'OK':
+                session['user']['2fa_logged'] = True
+                return redirect('/inheritedwills')
+            elif response_params['status'] == 'NOK':
+                flash(response_params['message'], "danger")
+                return redirect('/')
+            else:
+                return redirect('/')
         else:
             # ir buscar secret key do user, por enquanto usar random
             secret = pyotp.random_base32()
