@@ -1,3 +1,5 @@
+SET GLOBAL sql_mode='';
+
 DROP DATABASE IF EXISTS service_DB;
 
 CREATE DATABASE service_DB;
@@ -10,18 +12,18 @@ DROP TABLE IF EXISTS service_user;
 
 CREATE TABLE service_user (
     service_username VARCHAR(50) PRIMARY KEY,
-    user_pk VARCHAR (150)
+    user_pk VARCHAR (150) DEFAULT ''
 );
 
 
 /* ---  KEY TABLE ---*/
 
-DROP TABLE IF EXISTS share_key 
+DROP TABLE IF EXISTS share_key;
 
 CREATE TABLE share_key(
     key_id INT(10) NOT NULL AUTO_INCREMENT,
     value_of_key VARCHAR(150) NOT NULL,
-    PRIMARY KEY key_id
+    PRIMARY KEY (key_id)
 );
 
 /* ---  WILL TABLE ---*/
@@ -50,7 +52,7 @@ CREATE TABLE user_share (
     key_id_share INT(10) NOT NULL,
     will_id_share INT(10) NOT NULL,
     PRIMARY KEY (username_share, key_id_share),
-    FOREIGN KEY (username)
+    FOREIGN KEY (username_share)
         REFERENCES service_user (service_username),
     FOREIGN KEY (key_id_share)
         REFERENCES share_key (key_id),

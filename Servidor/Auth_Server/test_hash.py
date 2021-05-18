@@ -33,7 +33,7 @@ def hash_of_fuck_off(username, curr_time, salt, password):
     for i in range(0,len(username)):
         pt1 = hash(pt1)
     
-    return xor_str(pt1, hash(username))
+    return pt1
 
 def test():
     h = hash_of_fuck_off('pedro', '12-05-2021', 'adfadfadfagadfgadgfsdg', 'in4cio')

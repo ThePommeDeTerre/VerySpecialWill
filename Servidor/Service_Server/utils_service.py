@@ -4,7 +4,7 @@ Auxiliar file with calculations
 
 """
 
-from json import load
+from dotenv import load_dotenv
 
 import jwt
 import os
@@ -23,7 +23,7 @@ def get_jwt_data(token):
 
     # decode
     try:
-        load.dotenv()
+        load_dotenv()
         data = jwt.decode(token, os.getenv("JWT_SECRET_KEY"), algorithm="HS512")
 
         return data
@@ -33,4 +33,21 @@ def get_jwt_data(token):
         print(error)
         return data
 
-# TODO: get usernames from the authentication database, acho
+
+def is_jwt_equals(jwt):
+
+    """
+    Given one jwt verifies if it is equals to the last one created
+    """
+
+    data = get_jwt_data(jwt)
+    username = data["user"]
+
+    dbHelper = helper_auth.DBHelper_auth()
+
+    jwt_db = dbHelper.get_jwt_from_user(username)
+
+    dbHelper.close()
+
+    # if they are equals and not the empty string
+    return jwt == jwt_db and bool(jwt)

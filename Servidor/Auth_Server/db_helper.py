@@ -24,6 +24,10 @@ class DBHelper:
         self.dbConnection = MySQLConnection(**db_config) # If we cannot connect let it crash
 
 
+    def close(self):
+        self.dbConnection.close()
+
+
     def read_db_config(self, filename, section):
 
         """
@@ -83,8 +87,10 @@ class DBHelper:
 
             pwd_hash = generate_hash(password, salt)
             if hash == pwd_hash:
+                cursor.close()
                 return True
             else:
+                cursor.close()
                 return False
         except Error as e:
             print(e)
@@ -94,11 +100,7 @@ class DBHelper:
         """
         Insert one single user
         """
-
-        """
-        Insert one single user
-        """
-
+        
         query = "INSERT INTO user_table(username, mail, pwd_salt, pwd_hash) " \
                 "VALUES(%s,%s,%s,%s)"
         args = (username, mail, pwd_salt, pwd_hash)
@@ -129,11 +131,33 @@ class DBHelper:
 
             # is is none then there is no matches
             if not value_2fa:
+                cursor.close()
                 return "NOK"
             else:
+                cursor.close()
                 # convert to string
                 return value_2fa.decode()
         
         except Error as e:
             print(e)
             return "NOK"
+
+
+    def store_jwt(self, token, username):
+
+        """
+        IDC insert jwt in authentication database
+        """
+
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+            query = "UPDATE user_table SET jwt = %s WHERE username = %s"
+            cursor.execute(query, (token, username))
+
+            cursor.close()
+            self.dbConnection.commit()
+            return True
+
+        except Error as e:
+            print(e)
+            return False
