@@ -148,7 +148,7 @@ class DBHelper_auth:
             # is is none then there is no matches
             if not value_2fa:
                 cursor.close()
-                return ""
+                return "NOK"
             else:
                 cursor.close()
                 # convert to string

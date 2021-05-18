@@ -1,6 +1,6 @@
 from Crypto.Hash import SHA512
 from helpers import OurAES
-from auth_db_helper import DBHelper_auth
+import db_helper as helper
 from base64 import b64decode
 
 
@@ -51,14 +51,14 @@ def encrypt_2fa(token, username):
 def decrypt_2fa(cypher, username):
     aes = OurAES.OurAES('CBC')
     h, h2 = get_2fa_necessities(username)
-    print(b64decode(cypher))
     decypher = aes.decrypt(b64decode(cypher), h[-32:], h2[0:16])
     return decypher
     
 def get_2fa_necessities(username):
-    dbHelper = DBHelper_auth()
+    dbHelper = helper.DBHelper()
     # creates two hashes one for key other for iv
     created_at, salt, fa2_token = dbHelper.get_user_info_for_2fa(username)
     h = hash_of_2fa(username, created_at.strftime("%m/%d/%Y"), salt)
     h2 = hash_of_2fa(salt, created_at.strftime("%m/%d/%Y"), username)
+    dbHelper.close()
     return h,h2

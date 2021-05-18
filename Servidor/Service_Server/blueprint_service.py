@@ -12,7 +12,6 @@ from flask import (
 
 from flask.json import jsonify
 from flask.wrappers import Response
-from helpers.fa_encryption import encrypt_2fa, decrypt_2fa
 import auth_db_helper as helper_auth
 import service_db_helper as helper_service
 import pyotp
