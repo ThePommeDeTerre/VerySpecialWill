@@ -46,7 +46,7 @@ def login():
             response = requests.post(url, json=params)
 
             # Caso a resposta nao seja ok
-            if response.status_code != 200:
+            if response.status_code != 200 and response.status_code != 401:
                 raise Exception()
 
             # Tratamento da resposta
@@ -64,14 +64,14 @@ def login():
                 flash(response_params['message'], "danger")
                 return redirect('/')
             else:
-                flash("An Error has occurred, please contact support", "error")
+                flash("An Error has occurred, please contact support", "danger")
                 return redirect('/')
         else:
-            flash("An Error has occurred, please contact support", "error")
+            flash("An Error has occurred, please contact support", "danger")
             return redirect('/')
 
     # Caso haja erros de status ou conexão
-    except:
+    except Exception as e:
         flash("An Error has occurred, please contact support", "error")
         return redirect('/')
 
@@ -94,12 +94,19 @@ def registo():
             response = requests.post(url, json=params)
 
             # Caso a resposta nao seja ok
-            if response.status_code != 201:
+            if response.status_code != 200:
                 raise Exception()
 
             # Tratamento da resposta
             response_params = response.json()
             if response_params['status'] == 'OK':
+                session['user'] = \
+                    {
+                        '2fa_logged': False,
+                        '2fa_token': response_params['token_2fa'],
+                        'username': response_params['username'],
+                        'jwt_token': response_params['jwt_token'],
+                    }
                 flash("Good Job", "danger")
                 return redirect(url_for('login_2fa'))
             elif response_params['status'] == 'NOK':
@@ -168,11 +175,22 @@ def get_qrcode():
 def createwill():
     try:
         if request.method == 'POST':
-            teste = 1
+            params = request.get_json()
+            params, valid = Common.trim_params(params)
+
+            if not valid:
+                flash('Please fill all fields', "danger")
+                return redirect('/createwill')
+
+            message, valid = Common.test_create_will(params)
+            if not valid:
+                return message
+
+            return Common.create_response_message(200, False, 'Ocorreu um teste')
         else:
             return render_template('createwill.html')
     # Caso haja erros de status ou conexão
-    except:
+    except Exception as e:
         return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 
@@ -183,7 +201,7 @@ def inheritedwills():
             teste = 1
         else:
             # for testing
-            wills_list = [[1,'<script>alert("ola")</script>', 1, '10/20', '5:00'],
+            wills_list = [[1, '<script>alert("ola")</script>', 1, '10/20', '5:00'],
                           [2, 'Sou Eu', 1, '5/10', '5:00'],
                           [3, 'Maria Dos Xutos e Pontapés', 1, '15/20', '4:00'],
                           [4, 'Cristina Ferreira', 1, '200/20000', '3:00'],
