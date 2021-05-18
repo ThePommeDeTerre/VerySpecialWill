@@ -46,9 +46,10 @@ def encrypt_2fa(token, username):
     h = hash_of_2fa(username, created_at.strftime("%m/%d/%Y"), salt)
     h2 = hash_of_2fa(salt, created_at.strftime("%m/%d/%Y"), username)
 
+    print(token, h, h2)
+    
     # cyphers the token using AES
     aes = OurAES.OurAES('CBC')
-    print(token, h, h2)
     aes.encrypt(token, h[-32:], h2[0:16])
 
 

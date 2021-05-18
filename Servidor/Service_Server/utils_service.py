@@ -47,7 +47,7 @@ def is_jwt_valid(jwt_token):
     :return: message/data , valid
     """
 
-    if not bool(jwt_token.spli()):
+    if not bool(jwt_token.split()):
         message = {"status": "NOK",
                    "message": "Invalid Token"}
 
