@@ -136,7 +136,7 @@ class DBHelper:
             else:
                 cursor.close()
                 # convert to string
-                return value_2fa.decode()
+                return value_2fa
         
         except Error as e:
             print(e)
