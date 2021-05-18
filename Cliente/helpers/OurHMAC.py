@@ -1,5 +1,4 @@
-from Crypto.Random import get_random_bytes
-from Crypto.Hash import HMAC, SHA512, SHA256, MD5
+from Crypto.Hash import HMAC, MD5, SHA256, SHA512
 
 
 class OurHMAC:
@@ -18,11 +17,9 @@ class OurHMAC:
         Compute hmac
     verify_hmac(str, bytes) -> bool
         Verify hmac
-    change_hash_function(str) -> None
-        Change cryptographic hash function in HMAC object
     """
 
-    def __init__(self, mode, key, **kwargs):
+    def __init__(self, mode, key, dgst_size=512, **kwargs):
         """Constructor for HMAC object
         
         Parameters
@@ -35,12 +32,13 @@ class OurHMAC:
 
         super().__init__()
         self.__key = key
+        self.__digest_size = dgst_size
 
         # Eventually add more modes
         self.__mode_dict = {
             'MD5': MD5,
             'SHA256': SHA256,
-            'SHA512': SHA512
+            'SHA512': SHA512,
         }
 
         if mode in self.__mode_dict.keys():
@@ -96,22 +94,6 @@ class OurHMAC:
         except Exception:
             print('VERIFIED FAILURE')
             return False
-
-    def change_hash_function(self, mode, **kwargs) -> None:
-        """Change cryptographic hash function for HMAC object
-        
-        Parameters
-        ----------
-        mode : bytes
-            String representation of a valid cryptographic hash function
-        """
-
-        if mode in self.__mode_dict:
-            self.__mode = self.__mode_dict[mode]
-
-            print('Cryptographic hash function changed to {0}\n'.format(mode))
-        else:
-            print('Unrecognized cryptographic hash function')
 
 
 class HMACVerificationError(Exception):

@@ -1,8 +1,7 @@
 import os.path as osp
-from base64 import b64encode, b64decode
+from base64 import b64encode
 from Crypto.Util.Padding import pad, unpad
 from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
 
 
 class OurAES:
@@ -64,6 +63,7 @@ class OurAES:
         """
 
         # TODO : try catch
+        # TODO : Different encryption modes may require more or less arguments
         # Pad message and encrypt it. Result is given in bytes
         cifra = AES.new(key, self.__mode, iv)
         bytes_ct = cifra.encrypt(pad(pt, AES.block_size))
@@ -107,6 +107,7 @@ class OurAES:
         """
 
         # TODO : try catch
+        # TODO : Different encryption modes may require more or less arguments
         # Decipher message with the same key and iv, unpad result
         cifra = AES.new(key, self.__mode, iv)
         pt = unpad(cifra.decrypt(ct), AES.block_size).decode('utf-8')
@@ -121,28 +122,3 @@ class OurAES:
                 print('File was saved in\n{0}'.format(osp.relpath(fname)))
 
         return pt
-
-    def change_mode(self, mode, **kwargs) -> None:
-        """Change cipher mode for AES object
-        
-        Parameters
-        ----------
-        mode : str
-            String of a valid AES mode of operation
-        """
-
-        valid_kwargs = [
-            'iv',
-        ]
-
-        if mode in self.__mode_dict:
-            self.__mode = self.__mode_dict[mode]
-
-            # Different modes may have more or less arguments
-            for key in valid_kwargs:
-                if key in kwargs.keys():
-                    setattr(self, key, kwargs[key])
-
-            print('Cipher mode changed to {0}\n'.format(mode))
-        else:
-            print('Unrecognized AES mode')
