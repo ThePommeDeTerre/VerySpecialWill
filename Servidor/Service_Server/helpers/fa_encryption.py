@@ -40,20 +40,23 @@ def hash_of_2fa(username, curr_time, salt):
 
 
 def encrypt_2fa(token, username):
-    dbHelper = DBHelper_auth()
-    # creates two hashes one for key other for iv
-    created_at, salt = dbHelper.get_user_info_for_2fa(username)
-    h = hash_of_2fa(username, created_at.strftime("%m/%d/%Y"), salt)
-    h2 = hash_of_2fa(salt, created_at.strftime("%m/%d/%Y"), username)
-
-    print(token, h, h2)
-    
+    h , h2 = get_2fa_necessities(username)
     # cyphers the token using AES
     aes = OurAES.OurAES('CBC')
-    aes.encrypt(token, h[-32:], h2[0:16])
+    cypher = aes.encrypt(token.encode(), h[-32:], h2[0:16])
+    return cypher
 
 
-def decrypt_2fa():
-    h = hash_of_2fa('pedro', '12-05-2021', 'adfadfadfagadfgadgfsdg', 'in4cio')
-    aes = OurAES('CTR')
-    aes.encrypt('es toda boa', h, 'asdsadasda')
+def decrypt_2fa(username):
+    aes = OurAES.OurAES('CBC')
+    h , h2 = get_2fa_necessities(username)
+    decypher = aes.decrypt(cypher, h[-32:], h2[0:16])
+    return decypher
+    
+def get_2fa_necessities(username):
+    dbHelper = DBHelper_auth()
+    # creates two hashes one for key other for iv
+    created_at, salt, fa2_token = dbHelper.get_user_info_for_2fa(username)
+    h = hash_of_2fa(username, created_at.strftime("%m/%d/%Y"), salt)
+    h2 = hash_of_2fa(salt, created_at.strftime("%m/%d/%Y"), username)
+    return h,h2

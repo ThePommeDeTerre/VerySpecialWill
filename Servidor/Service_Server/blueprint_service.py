@@ -40,8 +40,6 @@ def login_user2fa():
     jwt_token = get_from_json("jwt_token")
     secret_token = get_from_json("secret")
     fa_code = get_from_json("otp")
-    print(secret_token)
-    print(fa_code)
 
     #verifica se o jwt é valido
     jwt_data, jwt_valid = is_jwt_valid(jwt_token) 
@@ -50,7 +48,6 @@ def login_user2fa():
     if not jwt_valid:
         return jwt_data
     del jwt_valid
-    print(jwt_data)
     encrypt_2fa(secret_token,jwt_data['user'])
 
     return jsonify(jwt_data)

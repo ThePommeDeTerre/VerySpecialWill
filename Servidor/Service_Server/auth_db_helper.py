@@ -124,9 +124,8 @@ class DBHelper_auth:
 
         try:
             cursor = self.dbConnection.cursor(buffered=True)
-            print(username)
-            cursor.execute("SELECT created_at, pwd_salt FROM user_table WHERE username = %s", (username, ))
-            (created_at, pwd_salt) = cursor.fetchone()
+            cursor.execute("SELECT created_at, pwd_salt, fa2_token FROM user_table WHERE username = %s", (username, ))
+            (created_at, pwd_salt, fa2_token) = cursor.fetchone()
             cursor.close()
 
             if not username:

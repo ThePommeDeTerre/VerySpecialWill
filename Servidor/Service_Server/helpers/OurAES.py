@@ -63,11 +63,10 @@ class OurAES:
         """
 
         # TODO : try catch
-        # TODO : Different encryption modes may require more or less arguments
+        # TODO : Different encryption modes may require more or less argumentsD
         # Pad message and encrypt it. Result is given in bytes
         cifra = AES.new(key, self.__mode, iv)
         bytes_ct = cifra.encrypt(pad(pt, AES.block_size))
-
         # Kwarg routines
         if 'show' in kwargs.keys() and kwargs['show']:
             # Ciphertext in printable format
