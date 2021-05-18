@@ -22,7 +22,6 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
       MYSQL_DATABASE: auth_DB
-      MYSQL_PORT: 9012
     volumes:
       - auth_db:/var/lib/mysql                  # data will be persisted here
       - ./Servidor/Databases/auth_database.sql:/docker-entrypoint-initdb.d/auth_database.sql
@@ -71,7 +70,6 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin123
       MYSQL_DATABASE: service_DB
-      MYSQL_PORT: 9012
     volumes:
       - service_db:/var/lib/mysql
       - ./Servidor/Databases/service_database.sql:/docker-entrypoint-initdb.d/service_database.sql
