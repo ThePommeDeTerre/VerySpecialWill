@@ -1,3 +1,8 @@
 from tiangolo/uwsgi-nginx-flask:latest
-run /usr/local/bin/python -m pip install --upgrade pip
-run pip install -r requirements.txt
+
+COPY ./Servidor/requirements.txt /tmp/
+
+RUN /usr/local/bin/python -m pip install --upgrade pip
+RUN pip install --requirement /tmp/requirements.txt
+
+COPY . /tmp/

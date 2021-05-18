@@ -1,3 +1,5 @@
+SET GLOBAL sql_mode='';
+
 DROP DATABASE IF EXISTS service_DB;
 
 CREATE DATABASE service_DB;
@@ -10,7 +12,7 @@ DROP TABLE IF EXISTS service_user;
 
 CREATE TABLE service_user (
     service_username VARCHAR(50) PRIMARY KEY,
-    user_pk VARCHAR (150)
+    user_pk VARCHAR (150) DEFAULT ''
 );
 
 

@@ -98,6 +98,7 @@ class DBHelper_service:
 
         try:
             cursor = self.dbConnection.cursor(buffered=True)
+            # not insert duplicates
             cursor.execute("INSERT IGNORE INTO service_user (service_username) VALUES (%s)", (username, ))
 
             self.dbConnection.commit()
@@ -118,6 +119,7 @@ class DBHelper_service:
         """
 
         try:
+            # connect
             dbHelper_auth = helper_auth.DBHelper_auth()
             usernames_auth = dbHelper_auth.get_all_usernames_authentication()
 

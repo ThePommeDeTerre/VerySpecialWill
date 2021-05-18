@@ -141,3 +141,23 @@ class DBHelper:
         except Error as e:
             print(e)
             return "NOK"
+
+
+    def store_jwt(self, token, username):
+
+        """
+        IDC insert jwt in authentication database
+        """
+
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+            query = "UPDATE user_table SET jwt = %s WHERE username = %s"
+            cursor.execute(query, (token, username))
+
+            cursor.close()
+            self.dbConnection.commit()
+            return True
+
+        except Error as e:
+            print(e)
+            return False
