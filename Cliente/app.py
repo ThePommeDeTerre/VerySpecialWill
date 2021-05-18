@@ -107,7 +107,7 @@ def registo():
                         'username': response_params['username'],
                         'jwt_token': response_params['jwt_token'],
                     }
-                flash("Good Job", "danger")
+                flash("Welcome", "primary")
                 return redirect(url_for('login_2fa'))
             elif response_params['status'] == 'NOK':
                 flash(response_params['message'], "danger")
@@ -130,7 +130,7 @@ def registo():
 # endregion
 
 # region 2fa
-@app.route('/login/2fa', methods=['GET'])
+@app.route('/login/2fa', methods=['GET','POST'])
 def login_2fa():
     try:
         if request.method == 'POST':
@@ -141,8 +141,11 @@ def login_2fa():
                 flash('Please fill all fields', "danger")
                 return redirect('/')
 
-            url = SerRoutes.ROUTES['registo']
+            params['jwt_token'] = session['user']['jwt_token']
+            url = SerRoutes.ROUTES['login_2fa']
             response = requests.post(url, json=params)
+            teste = 1
+            return redirect('/')
         else:
             # ir buscar secret key do user, por enquanto usar random
             secret = pyotp.random_base32()

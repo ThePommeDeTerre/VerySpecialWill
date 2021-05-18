@@ -5,13 +5,16 @@ Auxiliar file with calculations
 """
 
 from dotenv import load_dotenv
+from flask.json import jsonify
 
 import jwt
 import os
 import auth_db_helper as helper_auth
 
-def get_jwt_data(token):
+# region jwt
 
+
+def get_jwt_data(token):
     """
     Get the data in the jwt
     :param token: JWT
@@ -27,7 +30,8 @@ def get_jwt_data(token):
     # decode
     try:
         load_dotenv()
-        data = jwt.decode(token, os.getenv("JWT_SECRET_KEY"), algorithm="HS512")
+        data = jwt.decode(token, os.getenv(
+            "JWT_SECRET_KEY"), algorithm="HS512")
 
         return data
 
@@ -36,9 +40,28 @@ def get_jwt_data(token):
         print(error)
         return data
 
+def is_jwt_valid(jwt_token):
+    """
+    if the signature is invalid or the jwt isn't the most recent one
+    :param token: JWT
+    :return: message/data , valid
+    """
+
+    # verify token
+    jwt_data = get_jwt_data(jwt_token)
+
+    # if the signature is invalid or the jwt isn't the most recent one
+    if ((not jwt_data) or (not is_jwt_equals(jwt_token))):
+        message = {"status": "NOK",
+                   "message": "Invalid Token"}
+
+        # 401 - UNAUTHORIZED - session token doesn't authorize the user anymore
+        return jsonify(message), False
+    else:
+        return jwt_data, True
+
 
 def is_jwt_equals(jwt):
-
     """
     Given one jwt verifies if it is equals to the last one created
     """
@@ -54,3 +77,5 @@ def is_jwt_equals(jwt):
 
     # if they are equals and not the empty string
     return jwt == jwt_db and bool(jwt)
+
+# endregion jwt

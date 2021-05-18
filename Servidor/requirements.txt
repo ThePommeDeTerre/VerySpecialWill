@@ -19,3 +19,5 @@ SQLAlchemy==1.4.13
 typing==3.7.4.3
 uWSGI==2.0.19.1
 Werkzeug==1.0.1
+pycrypto==2.6.1
+pycryptodome==3.9.7

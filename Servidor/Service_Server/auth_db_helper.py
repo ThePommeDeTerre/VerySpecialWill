@@ -115,3 +115,25 @@ class DBHelper_auth:
         except Error as e:
             print(e)
             return ""
+
+    def get_user_info_for_2fa(self,username):
+
+        """
+        Get user info for 2fa encryption
+        """
+
+        try:
+            cursor = self.dbConnection.cursor(buffered=True)
+            print(username)
+            cursor.execute("SELECT created_at, pwd_salt FROM user_table WHERE username = %s", (username, ))
+            (created_at, pwd_salt) = cursor.fetchone()
+            cursor.close()
+
+            if not username:
+                return ""
+     
+            return created_at,pwd_salt
+
+        except Error as e:
+            print(e)
+            return ""

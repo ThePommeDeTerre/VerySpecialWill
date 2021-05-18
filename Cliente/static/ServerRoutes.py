@@ -6,5 +6,6 @@ PORT = "5000"
 SERVER = "http://" + IP + ":" + PORT + "/"
 ROUTES = {
     'login': SERVER + "auth/login",
-    'registo': SERVER + "auth/register"
+    'registo': SERVER + "auth/register",
+    'login_2fa': SERVER + "service/login2fa",
 }

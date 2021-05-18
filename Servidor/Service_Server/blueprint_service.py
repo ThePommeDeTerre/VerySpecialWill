@@ -12,6 +12,7 @@ from flask import (
 
 from flask.json import jsonify
 from flask.wrappers import Response
+from helpers.fa_encryption import encrypt_2fa, decrypt_2fa
 
 import service_db_helper as helper_service
 
@@ -20,8 +21,39 @@ service_blueprint = Blueprint('service', __name__,)
 # must be here to avoid circular imports
 from utils_service import (
     get_jwt_data,
-    is_jwt_equals
+    is_jwt_equals,
+    is_jwt_valid
 )
+
+@service_blueprint.route("/login2fa", methods=["POST"])
+def login_user2fa():
+
+    """
+    Method to verify 2fa after login
+
+    :param: 2fa_token,code
+    :return: jwt, status, 2fa token and username if the credentials are valid
+             401 if the credentials are invalid             
+    """
+    
+    # get parameters
+    jwt_token = get_from_json("jwt_token")
+    secret_token = get_from_json("secret")
+    fa_code = get_from_json("otp")
+    print(secret_token)
+    print(fa_code)
+
+    #verifica se o jwt é valido
+    jwt_data, jwt_valid = is_jwt_valid(jwt_token) 
+
+    #caso não seja retorna uma mensagem de erro
+    if not jwt_valid:
+        return jwt_data
+    del jwt_valid
+    print(jwt_data)
+    encrypt_2fa(secret_token,jwt_data['user'])
+
+    return jsonify(jwt_data)
 
 @service_blueprint.route("/create", methods=["POST"])
 def create_will():
@@ -47,14 +79,13 @@ def create_will():
     # connect to service db
     dbHelper = helper_service.DBHelper_service()
     
-    # if the signature is invalid or the jwt isn't the most recent one
-    if ((not jwt_data) or (not is_jwt_equals(jwt_token))):
-        message = {"status": "NOK",
-                   "message": "Invalid Token"}
+    #verifica se o jwt é valido
+    jwt_data, jwt_valid = is_jwt_valid(jwt_token) 
 
-        # 401 - UNAUTHORIZED - session token doesn't authorize the user anymore
-        return jsonify(message)
-
+    #caso não seja retorna uma mensagem de erro
+    if not jwt_valid:
+        return jwt_data
+    del jwt_valid
 
     # update table user in service db with usernames from auth db
     if not dbHelper.populate_service_with_auth():

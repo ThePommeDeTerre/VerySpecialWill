@@ -50,11 +50,21 @@ def register_user():
         # actually write to DB
         if dbHelper.insert_user(username, user_email, password_salt, password_hash):
 
+            # expiration time - 15 minutes
+            exp =  int(time.time())+900
+
+            # data to incorporate the message
+            dataToEncode = {'user': username, 'exp': exp}
+
             # get the query result, i.e verify the user existence
             is_2fa_enabled = dbHelper.user_has_2fa(username)
 
+            # get the query result, i.e verify the user existence
+            jwt_token = generate_jwt_token(dataToEncode)
+            dbHelper.store_jwt(jwt_token, username)
+
             # wrap into message to send it
-            message = {"token_2fa": is_2fa_enabled}
+            message = {"status":"OK","token_2fa": is_2fa_enabled,"jwt_token": jwt_token,"username" : username}
 
             # 201: Success - Created 
             dbHelper.close()
