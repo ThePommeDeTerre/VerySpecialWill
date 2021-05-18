@@ -10,7 +10,7 @@
         {% block header %}{% endblock %}
     </header>
     <div class="container grid-lg">
-        {% if 'user' in g and g.user.is_authenticated %}
+        {% if 'user' in g and g.user['2fa_logged'] %}
             <header style="background-color:rgb(252,252,252);padding: 0.5rem" class="navbar">
                 <section class="navbar-section">
                     <a href="createwill" class="btn btn-link">Create New Will</a>

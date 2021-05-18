@@ -12,9 +12,9 @@ from flask import (
 
 from flask.json import jsonify
 from flask.wrappers import Response
-from helpers.fa_encryption import encrypt_2fa, decrypt_2fa
-
+import auth_db_helper as helper_auth
 import service_db_helper as helper_service
+import pyotp
 
 service_blueprint = Blueprint('service', __name__,)
 
@@ -33,25 +33,52 @@ def login_user2fa():
 
     :param: 2fa_token,code
     :return: jwt, status, 2fa token and username if the credentials are valid
-             401 if the credentials are invalid             
+             401 if the credentials are invalid
     """
-    
+
     # get parameters
     jwt_token = get_from_json("jwt_token")
     secret_token = get_from_json("secret")
     fa_code = get_from_json("otp")
 
     #verifica se o jwt é valido
-    jwt_data, jwt_valid = is_jwt_valid(jwt_token) 
+    jwt_data, jwt_valid = is_jwt_valid(jwt_token)
 
     #caso não seja retorna uma mensagem de erro
     if not jwt_valid:
         return jwt_data
     del jwt_valid
-    encrypt_2fa(secret_token,jwt_data['user'])
 
-    return jsonify(jwt_data)
+    db_auth = helper_auth.DBHelper_auth()
+    fa_token = db_auth.user_has_2fa(jwt_data['user'])
+    
+    if not bool(fa_token):
+        totp = pyotp.TOTP(secret_token)
 
+        if not totp.verify(fa_code):
+            return jsonify({"status": "NOK", "message": "Wrong 2FA code"})
+
+        crypt = encrypt_2fa(secret_token,jwt_data['user'])
+
+        result = db_auth.insert_user_info_for_2fa(crypt, jwt_data['user'])
+
+        db_auth.commit()
+        db_auth.close()
+
+        if result: 
+            return jsonify({"status": "OK"})
+        else:
+            return jsonify({"status": "NOK", "message": "You are contacting support"})
+
+    else: 
+        secret_token = decrypt_2fa(fa_token, jwt_data['user'])
+        totp = pyotp.TOTP(secret_token)
+
+        if not totp.verify(fa_code):
+            return jsonify({"status": "NOK", "message": "Wrong 2FA code"})
+        else:
+            return jsonify({"status": "OK"})
+            
 @service_blueprint.route("/create", methods=["POST"])
 def create_will():
 
@@ -69,15 +96,15 @@ def create_will():
 
         # 401 - UNAUTHORIZED - session token doesn't authorize the user anymore
         return jsonify(message)
-    
+
     # verify token
     jwt_data = get_jwt_data(jwt_token)
 
     # connect to service db
     dbHelper = helper_service.DBHelper_service()
-    
+
     #verifica se o jwt é valido
-    jwt_data, jwt_valid = is_jwt_valid(jwt_token) 
+    jwt_data, jwt_valid = is_jwt_valid(jwt_token)
 
     #caso não seja retorna uma mensagem de erro
     if not jwt_valid:
@@ -102,6 +129,6 @@ def create_will():
 def get_from_json(JSONKey):
 
     """
-    Get the parameter from json 
+    Get the parameter from json
     """
     return request.get_json()[JSONKey]
