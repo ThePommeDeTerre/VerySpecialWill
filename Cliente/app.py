@@ -152,7 +152,12 @@ def login_2fa():
             # Tratamento da resposta
             response_params = response.json()
             if response_params['status'] == 'OK':
-                session['user']['2fa_logged'] = True
+                session['user'] = \
+                    {
+                        '2fa_logged': True,
+                        'username': session['user']['username'],
+                        'jwt_token': session['user']['jwt_token'],
+                    }
                 return redirect('/inheritedwills')
             elif response_params['status'] == 'NOK':
                 flash(response_params['message'], "danger")
@@ -236,8 +241,8 @@ def before_request():
     request_guest_handpoints = ['login', 'registo', 'qrcode', 'main', 'sendemail', 'static']
 
     # for testing
-    request_guest_handpoints.append('createwill')
-    request_guest_handpoints.append('inheritedwills')
+    #request_guest_handpoints.append('createwill')
+    #request_guest_handpoints.append('inheritedwills')
 
     if 'user' in session:
         g.user = session['user']
