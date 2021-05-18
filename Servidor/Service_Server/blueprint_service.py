@@ -55,6 +55,7 @@ def create_will():
 
     # TODO : continue this - get the message, the people to give keys ...
 
+
 def get_from_json(JSONKey):
 
     """

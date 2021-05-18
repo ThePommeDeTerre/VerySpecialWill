@@ -98,10 +98,13 @@ def login_user():
         # check if the user has 2fa entry in the database and send the result
         token_2fa = dbHelper.user_has_2fa(user_name)
 
+        jwt_token = generate_jwt_token(dataToEncode)
+        dbHelper.store_jwt(jwt_token, user_name)
+
         dbHelper.close()
 
         # returns the session token with the status and the 2fa token
-        return jsonify({"jwt_token": generate_jwt_token(dataToEncode), 
+        return jsonify({"jwt_token": jwt_token, 
                         "status": "OK", 
                         "token_2fa": token_2fa,
                         "username" : user_name})

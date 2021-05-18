@@ -23,12 +23,13 @@ services:
       MYSQL_DATABASE: auth_DB
     volumes:
       - auth_db:/var/lib/mysql                  # data will be persisted here
-      - ./Databases/auth_database.sql:/docker-entrypoint-initdb.d/auth_database.sql
+      - ./Servidor/Databases/auth_database.sql:/docker-entrypoint-initdb.d/auth_database.sql
     networks:
       backend:
         ipv4_address: 172.20.1.1
     cap_add:                                    # handle the ```mbind: Operation not permitted``` error softly
       - SYS_NICE
+    command: mysqld --sql_mode=""
 
   adminer:
     container_name: adminer
@@ -68,14 +69,15 @@ services:
       MYSQL_DATABASE: service_DB
     volumes:
       - service_db:/var/lib/mysql
-      - ./Databases/service_database.sql:/docker-entrypoint-initdb.d/service_database.sql
+      - ./Servidor/Databases/service_database.sql:/docker-entrypoint-initdb.d/service_database.sql
     ports: 
       - '3308:3308'
     networks:
       backend:
         ipv4_address: 172.20.1.4
     cap_add:
-      - SYS_NICE   
+      - SYS_NICE 
+    command: mysqld --sql_mode=""  
 
   service_server:
     container_name: service_flask_server
