@@ -21,6 +21,9 @@ def get_jwt_data(token):
     # empty dict
     data = {}
 
+    if not token:
+        return data
+
     # decode
     try:
         load_dotenv()

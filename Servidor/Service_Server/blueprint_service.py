@@ -32,6 +32,14 @@ def create_will():
 
     # get jwt token
     jwt_token = get_from_json("jwt_token")
+
+    # JWT can't be empty, if it is stop right now
+    if not bool(jwt_token.split()):
+        message = {"status": "NOK",
+                   "message": "Invalid Token"}
+
+        # 401 - UNAUTHORIZED - session token doesn't authorize the user anymore
+        return jsonify(message)
     
     # verify token
     jwt_data = get_jwt_data(jwt_token)
