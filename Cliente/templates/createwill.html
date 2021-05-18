@@ -10,6 +10,18 @@
 
 {% block content %}
     {#FORMULARIO DE CIFRA#}
+    <h4 id="alert-messages" style="width:100%">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div  style="text-align: center" class="toast toast-{{ category }}">
+
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </h4>
     <form id="form-createwill" method="post">
         <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
 

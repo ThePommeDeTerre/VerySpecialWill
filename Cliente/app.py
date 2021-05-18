@@ -175,11 +175,22 @@ def get_qrcode():
 def createwill():
     try:
         if request.method == 'POST':
-            teste = 1
+            params = request.get_json()
+            params, valid = Common.trim_params(params)
+
+            if not valid:
+                flash('Please fill all fields', "danger")
+                return redirect('/createwill')
+
+            message, valid = Common.test_create_will(params)
+            if not valid:
+                return message
+
+            return Common.create_response_message(200, False, 'Ocorreu um teste')
         else:
             return render_template('createwill.html')
     # Caso haja erros de status ou conexão
-    except:
+    except Exception as e:
         return Common.create_response_message(200, False, 'Ocorreu um erro')
 
 
