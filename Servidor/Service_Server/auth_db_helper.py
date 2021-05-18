@@ -86,8 +86,32 @@ class DBHelper_auth:
 
                 list_all_usernames.append(a)
 
+            cursor.close()
             # return the list with all the availabe usernames
             return list_all_usernames
 
         except Error as e:
             print(e)
+
+    
+    def get_jwt_from_user(self, username):
+
+        """
+        Get the most recent entry of jwt for a given user
+        """
+
+        try:
+            cursor = self.dbConnection.cursor(buffered=True)
+
+            cursor.execute("SELECT jwt FROM user_table WHERE username = %s", (username, ))
+            (jwt, ) = cursor.fetchone()
+            cursor.close()
+
+            if not jwt:
+                return ""
+     
+            return jwt
+
+        except Error as e:
+            print(e)
+            return ""
