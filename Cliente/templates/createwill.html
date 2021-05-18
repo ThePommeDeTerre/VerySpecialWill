@@ -10,7 +10,7 @@
 
 {% block content %}
     {#FORMULARIO DE CIFRA#}
-    <form>
+    <form id="form-createwill" method="post">
         <input type="hidden" id="csrf_token" value="{{ csrf_token() }}"/>
 
         <h5 class="s-subtitle mt-2" id="forms-input">Will Specification</h5>
@@ -34,13 +34,18 @@
 
             <div class="column col-4">
                 <div class="form-group">
-                    {#Confidential Level#}
+                    {#Confidential Leve
                     <label class="form-label" for="input-confidential_level">Confidential Level</label>
                     <select name="confidential_level" id="input-confidential_level" class="form-select"
                             placeholder="Confidential Level" required>
                         <option value="1">Secrets kept by server</option>
                         <option value="2">Secrets sent to users</option>
                     </select>
+                    l#}
+                    {#Allowed Date#}
+                    <label class="form-label" for="input-number_of_shares">Allowed Date</label>
+                    <input id="input-allowed_date" name="allowed_date" type="date" class="form-input"
+                           placeholder="Allowed Date" required>
 
                     {#Minimum Shares Needed#}
                     <label class="form-label" for="input-minimum_shares">Minimum Shares Needed</label>
@@ -107,7 +112,7 @@
 
         <div class="columns">
             <div class="column col-12 text-right">
-                <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Submit the Will
+                <button id="btn-submit"  type="button" class="btn btn-success"><i class="fas fa-plus"></i> Submit the Will
                 </button>
             </div>
         </div>

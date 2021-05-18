@@ -4,18 +4,69 @@ const IndexHelper = function () {
         initForm()
     }
 
+    //Funcao para ajudar a ver se está vazio (because javascript)
+    const isEmpty = function (value) {
+        return typeof value == 'string' && !value.trim() || typeof value == 'undefined' || value === null;
+    }
+
+    Date.prototype.toDateInputValue = (function () {
+        var local = new Date(this);
+        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+        return local.toJSON().slice(0, 10);
+    });
+
     //#region formulário
     //Inicializa o formulário, botões e ações
     const initForm = () => {
+        $('#input-allowed_date').val(new Date().toDateInputValue());
         $('#btn-add-user').on('click', add_user)
-
         $("#users-table").on('click', 'button', delete_user)
+        $('#btn-submit').on('click', test_form);
+    }
+
+    const test_form = function () {
+        let date = $('#input-allowed_date').val(),
+            n_shares = $('#input-number_of_shares').val(),
+            min_shares = $('#input-minimum_shares').val(),
+            special_will = $('#input-special_will').val(),
+            emailList = $('#input-user_multiple').val()
+
+        if (isEmpty(n_shares) || isEmpty(min_shares) || isEmpty(special_will) || isEmpty(date) || isEmpty(emailList)) {
+            alert('Please fill all fields')
+            return false;
+        }
+        if (n_shares == 0 || min_shares == 0) {
+            alert('Shares values can\'t be 0')
+            return false;
+        }
+
+        let date_input = new Date(date)
+        let date_today = new Date()
+        date_today.setDate(date_today.getDate() - 1)
+        console.log(date_today)
+
+        if(date_today > date_input){
+            alert('Chosen date can\'t be before today')
+            return false;
+        }
+
+        if (n_shares < min_shares) {
+            alert('Number of shares must be superior or equal to number of minimum shares')
+            return false;
+        }
+
+        if(emailList.length < n_shares) {
+            alert('Number of emails must be the same as number of shares')
+            return false;
+        }
+
+        alert('success')
     }
 
     /*adiciona à tabela*/
     const add_user = function () {
         /*Verifica se o email é valido*/
-        if (!$('#input-user_to_add').is(':valid') ){
+        if (!$('#input-user_to_add').is(':valid')) {
             alert('Invalid Email to Add')
             return
         }
