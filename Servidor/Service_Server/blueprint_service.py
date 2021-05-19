@@ -15,6 +15,7 @@ from flask.wrappers import Response
 import auth_db_helper as helper_auth
 import service_db_helper as helper_service
 import pyotp
+import helpers.DecideMethod
 
 service_blueprint = Blueprint('service', __name__,)
 
@@ -118,10 +119,21 @@ def create_will():
     #     return jsonify(message)
 
     # in the end, close
+    # TODO : continue this - get the message, the people to give keys ...
+    
+    params = request.get_json()
+    cripto = params['cypher']
+    will = params['special_will']
+    hash = params['hash']
+
+    (cypher, hmac) = randomness_galore(will, cripto, hash)
+
+
+    insert_will(jwt_token['username'], cypher)
+
     db_auth.close()
     return jsonify({"message": "End"})
 
-    # TODO : continue this - get the message, the people to give keys ...
 
 
 def get_from_json(JSONKey):

@@ -139,3 +139,11 @@ class DBHelper_service:
         except Error as e:
             print(e)
             return False
+
+    def insert_will(self, username, will):
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+            query = "INSERT INTO will (will_message) VALUES %s" %()
+            cursor.execute(query, "")
+        except Error as e:
+            print(e)
