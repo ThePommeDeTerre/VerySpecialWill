@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS will;
 
 CREATE TABLE will (
     will_id INT(10) NOT NULL AUTO_INCREMENT,
-    will_message VARCHAR(200) NOT NULL,
+    will_message LONGTEXT NOT NULL,
     will_hmac VARCHAR(150) NOT NULL,
     will_sign VARCHAR(150) NOT NULL,
     user_owner VARCHAR(50) NOT NULL,
