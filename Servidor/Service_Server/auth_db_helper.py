@@ -9,6 +9,7 @@ from mysql.connector import MySQLConnection, Error
 from configparser import ConfigParser
 from base64 import b64encode, b64decode
 
+
 class DBHelper_auth:
     dbConnection = None
 
@@ -161,21 +162,42 @@ class DBHelper_auth:
     def insert_user_info_for_2fa(self, fa_crypt, username):
         try:
             cursor = self.dbConnection.cursor(prepared=True)
-            
+
             query = "UPDATE user_table SET fa2_token = %s WHERE username = %s"
             cursor.execute(query, (b64encode(fa_crypt).decode(), username))
 
-        except Error as e: 
+        except Error as e:
             print(e)
             return False
 
         finally:
             cursor.close()
-        
+
         return True
+
+    def verify_emails(self, email_list):
+        username_list = []
+        try:
+            for email in email_list:
+                cursor = self.dbConnection.cursor(buffered=True)
+                cursor.execute("SELECT username FROM user_table WHERE mail = %s", (email, ))
+                username = cursor.fetchone()
+
+                if username is None:
+                    return False
+                else:
+                    username_list.append(username[0])
+                cursor.close()
+
+            return username_list
+
+        except Error as e:
+            print(e)
+            return False
+
 
     def commit(self):
         try:
             self.dbConnection.commit()
-        except Error as e: 
+        except Error as e:
             print(e)

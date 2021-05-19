@@ -207,7 +207,22 @@ def createwill():
             if not valid:
                 return message
 
-            return Common.create_response_message(200, False, 'Ocorreu um teste')
+            params['jwt_token'] = session['user']['jwt_token']
+            url = SerRoutes.ROUTES['createwill']
+            response = requests.post(url, json=params)
+
+            # Caso a resposta nao seja ok
+            if response.status_code != 200:
+                raise Exception()
+
+            # Tratamento da resposta
+            response_params = response.json()
+            if response_params['status'] == 'OK':
+                return Common.create_response_message(200, True, response_params['message'])
+            elif response_params['status'] == 'NOK':
+                return Common.create_response_message(200, False, response_params['message'])
+            else:
+                return Common.create_response_message(200, False, 'Ocorreu um erro')
         else:
             return render_template('createwill.html')
     # Caso haja erros de status ou conexão

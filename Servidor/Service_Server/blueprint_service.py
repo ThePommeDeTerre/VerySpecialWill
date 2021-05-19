@@ -89,38 +89,36 @@ def create_will():
     # get jwt token
     jwt_token = get_from_json("jwt_token")
 
-    # JWT can't be empty, if it is stop right now
-    if not bool(jwt_token.split()):
-        message = {"status": "NOK",
-                   "message": "Invalid Token"}
-
-        # 401 - UNAUTHORIZED - session token doesn't authorize the user anymore
-        return jsonify(message)
-
-    # verify token
-    jwt_data = get_jwt_data(jwt_token)
-
-    # connect to service db
-    dbHelper = helper_service.DBHelper_service()
-
     #verifica se o jwt é valido
     jwt_data, jwt_valid = is_jwt_valid(jwt_token)
 
     #caso não seja retorna uma mensagem de erro
     if not jwt_valid:
-        return jwt_data
-    del jwt_valid
-
-    # update table user in service db with usernames from auth db
-    if not dbHelper.populate_service_with_auth():
-        message = {"status": "NOK",
-                   "message": "Error in database"}
-
-        # not created
+        message = {"status": "NOK","message": "Invalid Token"}
+        # 401 - UNAUTHORIZED - session token doesn't authorize the user anymore
         return jsonify(message)
 
+    del jwt_valid
+
+    #verificar se os emails existem
+    db_auth = helper_auth.DBHelper_auth()
+    username_list = db_auth.verify_emails(get_from_json("emailList"))
+
+    if not username_list:
+        message = {"status": "NOK","message": "One or more emails don\'t exist"}
+        return jsonify(message)
+
+
+    # # update table user in service db with usernames from auth db
+    # if not dbHelper.populate_service_with_auth():
+    #     message = {"status": "NOK",
+    #                "message": "Error in database"}
+
+    #     # not created
+    #     return jsonify(message)
+
     # in the end, close
-    dbHelper.close()
+    db_auth.close()
     return jsonify({"message": "End"})
 
     # TODO : continue this - get the message, the people to give keys ...

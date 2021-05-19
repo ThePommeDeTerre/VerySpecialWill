@@ -8,4 +8,5 @@ ROUTES = {
     'login': SERVER + "auth/login",
     'registo': SERVER + "auth/register",
     'login_2fa': SERVER + "auth/login2fa",
+    'createwill': SERVER + "service/create",
 }
