@@ -34,6 +34,9 @@
                     <label class="form-label" for="input-cypher_type">Cypher Type</label>
                     <select name="cypher_type" id="input-cypher_type" class="form-select" placeholder="Cypher Type" required>
                         <option value="1">AES-128-CBC</option>
+                        <option value="2">AES-128-ECB</option>
+                        <option value="3">AES-128-CTR</option>
+                        <option value="4">ChaCha20</option>
                     </select>
 
                     {#Number of Shares#}
@@ -46,14 +49,14 @@
 
             <div class="column col-4">
                 <div class="form-group">
-                    {#Confidential Leve
+                    {#Confidential Level#}
                     <label class="form-label" for="input-confidential_level">Confidential Level</label>
                     <select name="confidential_level" id="input-confidential_level" class="form-select"
                             placeholder="Confidential Level" required>
                         <option value="1">Secrets kept by server</option>
                         <option value="2">Secrets sent to users</option>
                     </select>
-                    l#}
+                    
                     {#Allowed Date#}
                     <label class="form-label" for="input-number_of_shares">Allowed Date</label>
                     <input id="input-allowed_date" name="allowed_date" type="date" class="form-input"
@@ -71,8 +74,9 @@
                 <label class="form-label" for="input-hash_function">Hash Function</label>
                 <select name="hash_function" id="input-hash_function" class="form-select"
                         placeholder="Hash Function" required>
-                    <option value="1">SHA256</option>
-                    <option value="2">SHA512</option>
+                        <option value="1">MD5</option>
+                        <option value="2">SHA256</option>
+                        <option value="3">SHA512</option>
                 </select>
             </div>
         </div>
