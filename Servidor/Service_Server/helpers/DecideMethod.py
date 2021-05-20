@@ -79,7 +79,7 @@ def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type:
     # Compute HMAC
     hmac = oHMAC.compute_hmac(plaintext)
 
-    return (bytes_ct, hmac, key)
+    return bytes_ct, hmac, key
 
 
 def share_secrets(min_shares: int, shares: int, key: bytes) -> List[Tuple[int, bytes]]:

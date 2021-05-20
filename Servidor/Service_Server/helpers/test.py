@@ -9,6 +9,7 @@ from OurAES import OurAES as AES
 from OurChaCha import OurChaCha
 from OurHMAC import OurHMAC as HMAC
 from DecideMethod import randomness_galore, share_secrets
+from OurGenKey import OurGenKey as RSA
 
 
 def main():
@@ -88,5 +89,23 @@ def main3():
     print(key)
 
 
+def main4():
+    with open('text.txt', 'r') as file:
+        plaintext = bytes(file.read(), 'utf-8')
+
+    pair = RSA.gen_key_pair()
+    public = RSA.extract_public(pair)
+
+    signature = RSA.sign_will(pair, plaintext)
+    print('Signature created')
+
+    input('Time window to dirty text.txt\n')
+
+    with open('text.txt', 'r') as file:
+        plaintext = bytes(file.read(), 'utf-8')
+
+    RSA.verify_will(public, plaintext, signature)
+
+
 if __name__ == '__main__':
-    main3()
+    main4()
