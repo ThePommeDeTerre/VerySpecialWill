@@ -96,9 +96,7 @@ def create_will():
 
         # caso não seja retorna uma mensagem de erro
         if not jwt_valid:
-            message = {"status": "NOK", "message": "Invalid Token"}
-            # 401 - UNAUTHORIZED - session token doesn't authorize the user anymore
-            return jsonify(message)
+            return jwt_data
 
         del jwt_valid
 
@@ -117,20 +115,6 @@ def create_will():
         if not db_service.populate_service_with_auth():
             message = {"status": "NOK",
                        "message": "Error in database"}
-
-        #     # not created
-        #     return jsonify(message)
-
-        # in the end, close
-        # TODO : continue this - get the message, the people to give keys ...
-
-        # cypher: $('#input-cypher_type').val(),
-        # hash: $('#input-hash_function').val(),
-        # date: date,
-        # n_shares: n_shares,
-        # min_shares: min_shares,
-        # special_will: special_will,
-        # emailList: emailList
 
         params = request.get_json()
         cripto_f = params['cypher']
@@ -154,7 +138,7 @@ def create_will():
 
         db_auth.close()
         db_service.close()
-        return jsonify({"message": "End"})
+        return jsonify({"status":"OK"})
     except Exception as e:
         print(traceback.format_exc())
         if db_auth:

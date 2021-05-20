@@ -60,8 +60,7 @@ def is_jwt_valid(jwt_token):
 
     # if the signature is invalid or the jwt isn't the most recent one
     if ((not jwt_data) or (not is_jwt_equals(jwt_token))):
-        message = {"status": "NOK",
-                   "message": "Invalid Token"}
+        message = {"status": "NOK_TOKEN","message": "Invalid Token"}
 
         # 401 - UNAUTHORIZED - session token doesn't authorize the user anymore
         return jsonify(message), False

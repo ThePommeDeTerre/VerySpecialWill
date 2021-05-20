@@ -16,6 +16,7 @@ from helpers.OurAES import OurAES as AesHelper
 from mysql.connector.cursor import CursorBase
 
 import auth_db_helper as helper_auth
+from base64 import b64encode
 
 
 class DBHelper_service:
@@ -178,6 +179,10 @@ class DBHelper_service:
             for i, username in enumerate(username_list):
                 secret_x = aes_worker.encrypt(secrets[i][0], secrets_key)
                 secret_y = aes_worker.encrypt(secrets[i][1], secrets_key)
+                secret_x = b64encode(secret_x).decode('utf-8')
+                secret_y = b64encode(secret_y).decode('utf-8')
+                print(secret_x)
+                print(secret_y)
 
                 cursor = self.dbConnection.cursor(prepared=True)
                 query = "INSERT INTO share_key (value_of_key_x, value_of_key_y) Values (%s,%s)"
