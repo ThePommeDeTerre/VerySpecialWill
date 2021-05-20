@@ -8,9 +8,10 @@ from Crypto.Protocol.SecretSharing import Shamir
 from OurAES import OurAES as AES
 from OurChaCha import OurChaCha
 from OurHMAC import OurHMAC as HMAC
-from DecideMethod import randomness_galore, share_secrets
+# from DecideMethod import randomness_galore, share_secrets
 from OurGenKey import OurGenKey as RSA
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 def main():
     # TODO : Abstract so it accepts files
@@ -108,4 +109,4 @@ def main4():
 
 
 if __name__ == '__main__':
-    main4()
+    main3()

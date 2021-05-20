@@ -1,12 +1,13 @@
-from OurAES import OurAES as AES
-from OurHMAC import OurHMAC as HMAC
-from OurChaCha import OurChaCha
-from OurShamir import OurShamir
+from helpers.OurAES import OurAES as AES
+from helpers.OurHMAC import OurHMAC as HMAC
+from helpers.OurChaCha import OurChaCha
+from helpers.OurShamir import OurShamir
 from Crypto.Random import get_random_bytes
 from typing import Tuple, List, Union
+from Crypto.Hash import SHA256
 
 
-def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type: str) -> Tuple[bytes, str, bytes]:
+def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type: str,date :str) -> Tuple[bytes, str, bytes]:
     """randomness_galore decides cryptographic and hash functionalities based on their string representations.
     The chosen cryptographic and hash methods are then performed on the plaintext.
     Returns the ciphertext , plaintext's HMAC and key used.
@@ -33,6 +34,7 @@ def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type:
     }
 
     h = {
+        '1': 'MD5',
         '2': 'SHA256',
         '3': 'SHA512'
         # Storing MD5 association is not necessary
@@ -41,18 +43,24 @@ def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type:
     if type(plaintext) is str:
         plaintext = plaintext.encode('utf-8')
 
-    key = get_random_bytes(32)
-    nonce = get_random_bytes(24)
+    # We use the chosen date as part of the key
+    # this allow us to only be able to decypher on that day
+    date_hash = SHA256.new(date.encode()).digest()
+    key = get_random_bytes(16)
+    nonce = date_hash[0:24]
 
     ctype = int(crypto_type)
     htype = int(hash_type)
+
+    # the last 16 bytes of the hash of the date are part of the key
+    key = key[:16] + nonce[-16:]
 
     # Treat cipher and encryption type
     if 0 < ctype <= 3:
 
         cmode = c[crypto_type]
-        key = key[:16]
-        iv = nonce[:16]
+        # the first 16 are used as the iv  depending on the cypher
+        iv = nonce[0:16]
         oAES = AES(cmode)
 
         # TODO : ECB, CBC, CTR may have different arguments
@@ -64,7 +72,8 @@ def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type:
         elif cmode == 'CTR':
             pass
 
-    elif ctype is 4:
+    elif ctype == 4:
+        # the first 24 are used as the nonce
         oCHACHA = OurChaCha()
         bytes_ct = oCHACHA.encrypt(plaintext, key, nonce)
 
@@ -73,7 +82,7 @@ def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type:
         hmode = h[hash_type]
         oHMAC = HMAC(hmode, key)
 
-    elif htype is 1:
+    elif htype == 1:
         oHMAC = HMAC('MD5', key)
 
     # Compute HMAC

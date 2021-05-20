@@ -1,5 +1,5 @@
 from Crypto.Protocol.SecretSharing import Shamir
-from OurHMAC import OurHMAC, HMACVerificationError
+from helpers.OurHMAC import OurHMAC, HMACVerificationError
 from typing import List, Tuple
 
 
