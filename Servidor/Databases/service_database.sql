@@ -22,7 +22,9 @@ DROP TABLE IF EXISTS share_key;
 
 CREATE TABLE share_key(
     key_id INT(10) NOT NULL AUTO_INCREMENT,
-    value_of_key VARCHAR(150) NOT NULL,
+    value_of_key_x VARCHAR(150) NOT NULL,
+    value_of_key_y VARCHAR(150) NOT NULL,
+    active TINYINT DEFAULT 0,
     PRIMARY KEY (key_id)
 );
 
@@ -32,9 +34,10 @@ DROP TABLE IF EXISTS will;
 
 CREATE TABLE will (
     will_id INT(10) NOT NULL AUTO_INCREMENT,
-    will_message VARCHAR(200) NOT NULL,
-    will_hmac VARCHAR(150) NOT NULL,
-    will_sign VARCHAR(150) NOT NULL,
+    will_message LONGTEXT NOT NULL,
+    will_hmac VARCHAR(256) NOT NULL,
+    will_sign VARCHAR(256) NOT NULL,
+    will_pub TEXT NOT NULL,
     user_owner VARCHAR(50) NOT NULL,
     n_min_shares INT(10) NOT NULL,
     PRIMARY KEY (will_id),

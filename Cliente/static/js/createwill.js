@@ -65,6 +65,7 @@ const IndexHelper = function () {
         }
         if (n_shares == 0 || min_shares == 0) {
             alert('Shares values can\'t be 0')
+            element.attr('disabled', false)
             return false;
         }
 
@@ -74,16 +75,19 @@ const IndexHelper = function () {
 
         if (date_today > date_input) {
             alert('Chosen date can\'t be before today')
+            element.attr('disabled', false)
             return false;
         }
 
         if (n_shares < min_shares) {
             alert('Number of shares must be superior or equal to number of minimum shares')
+            element.attr('disabled', false)
             return false;
         }
 
         if (emailList.length < n_shares) {
             alert('Number of emails must be the same as number of shares')
+            element.attr('disabled', false)
             return false;
         }
 

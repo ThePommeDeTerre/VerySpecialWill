@@ -10,25 +10,28 @@ from mysql.connector import MySQLConnection, Error
 from configparser import ConfigParser
 from mysql.connector import cursor
 
+from helpers.OurShamir import OurShamir
+from helpers.OurAES import OurAES as AesHelper
+
 from mysql.connector.cursor import CursorBase
 
 import auth_db_helper as helper_auth
+from base64 import b64encode
+
 
 class DBHelper_service:
     dbConnection = None
 
     def __init__(self, filename='config_service.ini', section='mysql'):
         db_config = self.read_db_config_service(filename, section)
-        
-        self.dbConnection = MySQLConnection(**db_config) # If we cannot connect let it crash
 
+        # If we cannot connect let it crash
+        self.dbConnection = MySQLConnection(**db_config)
 
     def close(self):
         self.dbConnection.close()
 
-
     def read_db_config_service(self, filename, section):
-
         """
         Get the database
         :param filename: name of the file where the configuration shoud the read
@@ -47,13 +50,12 @@ class DBHelper_service:
             for item in items:
                 db[item[0]] = item[1]
         else:
-            raise Exception('{0} not found in the {1} file'.format(section, filename))
+            raise Exception(
+                '{0} not found in the {1} file'.format(section, filename))
 
         return db
 
-
     def iter_row(self, cursor, size=10):
-
         """
         Helper method to iterate over the rows of the table
         """
@@ -65,9 +67,7 @@ class DBHelper_service:
             for row in rows:
                 yield row
 
-            
     def check_if_user_exists(self, username):
-
         """
         Given the name of a user, we check if he already exists
         :param username: string
@@ -75,8 +75,9 @@ class DBHelper_service:
 
         try:
             cursor = self.dbConnection.cursor(buffered=True)
-            result = cursor.execute("SELECT service_username FROM service_user WHERE service_username = %s" , (username, ))
-           
+            result = cursor.execute(
+                "SELECT service_username FROM service_user WHERE service_username = %s", (username, ))
+
             cursor.close()
 
             if not result:
@@ -88,9 +89,7 @@ class DBHelper_service:
             print(e)
             return False
 
-
     def insert_username(self, username):
-        
         """
         Insert one single username
         :return: boolean depending on whether the operation is successful
@@ -99,7 +98,8 @@ class DBHelper_service:
         try:
             cursor = self.dbConnection.cursor(buffered=True)
             # not insert duplicates
-            cursor.execute("INSERT IGNORE INTO service_user (service_username) VALUES (%s)", (username, ))
+            cursor.execute(
+                "INSERT IGNORE INTO service_user (service_username) VALUES (%s)", (username, ))
 
             self.dbConnection.commit()
             cursor.close()
@@ -109,10 +109,7 @@ class DBHelper_service:
             print(e)
             return False
 
-
-
     def populate_service_with_auth(self):
-
         """
         Get the usernames from the authentication database and insert them in the service database
         :return: boolean depending on whether the operation is successful
@@ -132,10 +129,83 @@ class DBHelper_service:
                 if not self.check_if_user_exists(i):
                     self.insert_username(i)
                 else:
-                    continue        
+                    continue
 
             return True
 
         except Error as e:
             print(e)
             return False
+
+    def insert_will(self, username, will_ct, will_hmac, will_sign, will_pub, min_shares):
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+            query = "INSERT INTO will (will_message, will_hmac, will_sign, will_pub, user_owner, n_min_shares) " \
+                    "VALUES (%s, %s, %s, %s, %s, %s)"
+
+            args = (will_ct, will_hmac, will_sign,
+                    will_pub, username, min_shares)
+
+            cursor.execute(query, args)
+            id_will = cursor.lastrowid
+
+            cursor.close()
+            return id_will
+
+        except Error as e:
+            print(e)
+            return False
+
+    def insert_usershare(self):
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+
+            query = "INSERT INTO user_share (username_share, key_id_share, will_id_share)"
+
+            cursor.commit()
+            cursor.close()
+            return True
+        except Error as e:
+            print(e)
+            return False
+
+    def insert_users_of_will(self, will_id, key, username_list, min_shares, n_shares, date_hash):
+        try:
+            secrets = OurShamir.split_secret(min_shares, n_shares, key)
+            secrets_key = date_hash[-32:-16]
+
+            aes_worker = AesHelper('ECB')
+
+            for i, username in enumerate(username_list):
+                secret_x = aes_worker.encrypt(secrets[i][0], secrets_key)
+                secret_y = aes_worker.encrypt(secrets[i][1], secrets_key)
+                secret_x = b64encode(secret_x).decode('utf-8')
+                secret_y = b64encode(secret_y).decode('utf-8')
+                print(secret_x)
+                print(secret_y)
+
+                cursor = self.dbConnection.cursor(prepared=True)
+                query = "INSERT INTO share_key (value_of_key_x, value_of_key_y) Values (%s,%s)"
+                cursor.execute(query, (secret_x, secret_y))
+                key_id = cursor.lastrowid
+
+                query = "INSERT INTO user_share (username_share, key_id_share, will_id_share) Values (%s,%s,%s)"
+                cursor.execute(query, (username, key_id,will_id))
+
+            cursor.close()
+            return True
+        except Error as e:
+            print(e)
+            return False
+
+    def commit(self):
+        try:
+            self.dbConnection.commit()
+        except Error as e:
+            print(e)
+
+    def rollback(self):
+        try:
+            self.dbConnection.rollback()
+        except Error as e:
+            print(e)

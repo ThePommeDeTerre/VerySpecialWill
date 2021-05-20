@@ -162,6 +162,8 @@ def login_2fa():
             elif response_params['status'] == 'NOK':
                 flash(response_params['message'], "danger")
                 return redirect('/')
+            elif response_params['status'] == 'NOK_TOKEN':
+                return redirect('/cancel_2fa')
             else:
                 return redirect('/')
         else:
@@ -207,7 +209,24 @@ def createwill():
             if not valid:
                 return message
 
-            return Common.create_response_message(200, False, 'Ocorreu um teste')
+            params['jwt_token'] = session['user']['jwt_token']
+            url = SerRoutes.ROUTES['createwill']
+            response = requests.post(url, json=params)
+
+            # Caso a resposta nao seja ok
+            if response.status_code != 200:
+                raise Exception()
+
+            # Tratamento da resposta
+            response_params = response.json()
+            if response_params['status'] == 'OK':
+                return Common.create_response_message(200, True, response_params['message'])
+            elif response_params['status'] == 'NOK':
+                return Common.create_response_message(200, False, response_params['message'])
+            elif response_params['status'] == 'NOK_TOKEN':
+                return redirect('/cancel_2fa')
+            else:
+                return Common.create_response_message(200, False, 'Ocorreu um erro')
         else:
             return render_template('createwill.html')
     # Caso haja erros de status ou conexão
@@ -221,7 +240,12 @@ def inheritedwills():
         if request.method == 'POST':
             teste = 1
         else:
-            # for testing
+            params = []
+            params['jwt_token'] = session['user']['jwt_token']
+            url = SerRoutes.ROUTES['createwill']
+            response = requests.post(url, json=params)
+
+            # will id, owner username, active (ver se existe pelo menos um active) , quantas pessoas ativara/quantas sao precisas, timeout
             wills_list = [[1, '<script>alert("ola")</script>', 1, '10/20', '5:00'],
                           [2, 'Sou Eu', 1, '5/10', '5:00'],
                           [3, 'Maria Dos Xutos e Pontapés', 1, '15/20', '4:00'],

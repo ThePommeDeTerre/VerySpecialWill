@@ -9,7 +9,7 @@ def trim_params(params):
         # faz strip ao parametro e faz sanitize (impedir xss)
         if isinstance(params[p], list):
             for i, item in enumerate(params[p]):
-                params[p][i] = escape(item[i].rstrip())
+                params[p][i] = escape(item.rstrip())
         else:
             params[p] = escape(params[p].rstrip())
 

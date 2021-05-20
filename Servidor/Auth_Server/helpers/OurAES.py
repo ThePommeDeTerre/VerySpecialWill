@@ -61,6 +61,10 @@ class OurAES:
         ct : bytes
             Ciphertext byte representation
         """
+        if isinstance(key,str):
+            key = key.encode()
+        if isinstance(iv,str):
+            iv = iv.encode()
 
         # TODO : try catch
         # TODO : Different encryption modes may require more or less argumentsD
@@ -108,6 +112,11 @@ class OurAES:
         # TODO : try catch
         # TODO : Different encryption modes may require more or less arguments
         # Decipher message with the same key and iv, unpad result
+        
+        if isinstance(key,str):
+            key = key.encode()
+        if isinstance(iv,str):
+            iv = iv.encode()
         cifra = AES.new(key, self.__mode, iv)
         pt = unpad(cifra.decrypt(ct), AES.block_size).decode('utf-8')
 

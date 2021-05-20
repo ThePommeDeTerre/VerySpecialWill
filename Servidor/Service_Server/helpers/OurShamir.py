@@ -1,5 +1,5 @@
 from Crypto.Protocol.SecretSharing import Shamir
-from OurHMAC import OurHMAC, HMACVerificationError
+from helpers.OurHMAC import OurHMAC, HMACVerificationError
 from typing import List, Tuple
 
 
@@ -41,7 +41,11 @@ class OurShamir:
             the unique index (an integer)
             the share (a byte string, 16 bytes)
         """
-
+        if(isinstance(n,str)):
+            n = int(n)
+        if(isinstance(min_shares,str)):
+            min_shares = int(min_shares)
+            
         if n < min_shares:
             raise ShamirSecretSplitException()
         return Shamir.split(min_shares, n, key)
