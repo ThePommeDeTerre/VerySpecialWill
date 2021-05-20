@@ -33,8 +33,10 @@ DROP TABLE IF EXISTS will;
 CREATE TABLE will (
     will_id INT(10) NOT NULL AUTO_INCREMENT,
     will_message LONGTEXT NOT NULL,
-    will_hmac VARCHAR(150) NOT NULL,
-    will_sign VARCHAR(150) NOT NULL,
+    will_hmac VARCHAR(256) NOT NULL,
+    will_sign VARCHAR(256) NOT NULL,
+    will_pub TEXT NOT NULL,
+    will_nonce VARCHAR(256),
     user_owner VARCHAR(50) NOT NULL,
     n_min_shares INT(10) NOT NULL,
     PRIMARY KEY (will_id),

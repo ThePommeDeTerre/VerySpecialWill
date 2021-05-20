@@ -5,6 +5,8 @@ from helpers.OurShamir import OurShamir
 from Crypto.Random import get_random_bytes
 from typing import Tuple, List, Union
 from Crypto.Hash import SHA256
+from helpers.OurGenKey import OurGenKey as RSA
+
 
 
 def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type: str,date :str) -> Tuple[bytes, str, bytes]:
@@ -59,13 +61,13 @@ def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type:
     if 0 < ctype <= 3:
 
         cmode = c[crypto_type]
-        # the first 16 are used as the iv  depending on the cypher
-        iv = nonce[0:16]
+        # the first 16 are used as the iv depending on the cypher
+        nonce = nonce[0:16]
         oAES = AES(cmode)
 
         # TODO : ECB, CBC, CTR may have different arguments
         if cmode == 'CBC':
-            bytes_ct = oAES.encrypt(plaintext, key, iv)
+            bytes_ct = oAES.encrypt(plaintext, key, nonce)
         elif cmode == 'ECB':
             bytes_ct = oAES.encrypt(plaintext, key)
             pass
@@ -88,7 +90,13 @@ def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type:
     # Compute HMAC
     hmac = oHMAC.compute_hmac(plaintext)
 
-    return bytes_ct, hmac, key
+    # Compute pub key
+    pair = RSA.gen_key_pair()
+    public = RSA.extract_public(pair)
+
+    signature = RSA.sign_will(pair, plaintext)
+
+    return bytes_ct, hmac, key, public, signature, nonce
 
 
 def share_secrets(min_shares: int, shares: int, key: bytes) -> List[Tuple[int, bytes]]:

@@ -10,11 +10,11 @@ class OurGenKey:
         return RSA.generate(2048)
 
     @classmethod
-    def extract_public(cls, pair):
+    def extract_public(cls, pair) -> bytes:
         return pair.publickey().exportKey()
 
     @classmethod
-    def sign_will(cls, pair, plaintext):
+    def sign_will(cls, pair, plaintext) -> bytes:
         oHASH = SHA256.new(plaintext)
         signature = pkcs1_15.new(pair).sign(oHASH)
 

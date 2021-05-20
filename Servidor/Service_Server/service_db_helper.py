@@ -140,10 +140,32 @@ class DBHelper_service:
             print(e)
             return False
 
-    def insert_will(self, username, will):
+    def insert_will(self, username, will_ct,
+        will_hmac, will_sign, will_pub, will_nonce, 
+        min_shares, share_list):
         try:
             cursor = self.dbConnection.cursor(prepared=True)
-            query = "INSERT INTO will (will_message) VALUES %s" %()
-            cursor.execute(query, "")
+            query = "INSERT INTO will (will_message, will_hmac, will_sign, will_pub, will_nonce, user_owner, n_min_shares) VALUES %s, %s, %s, %s, %s, %s, %s",
+            args = (username, will_ct,will_hmac, will_sign, will_pub, will_nonce, min_shares)
+            cursor.execute(query, args)
+
+            cursor.commit()
+            cursor.close()
+            return True
+
         except Error as e:
             print(e)
+            return False
+
+    def insert_usershare(self):
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+
+            query = "INSERT INTO user_share (username_share, key_id_share, will_id_share)"
+
+            cursor.commit()
+            cursor.close()
+            return True
+        except Error as e:
+            print(e)
+            return False

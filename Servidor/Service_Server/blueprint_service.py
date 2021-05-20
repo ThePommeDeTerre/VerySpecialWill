@@ -134,10 +134,12 @@ def create_will():
     will_txt = params['special_will']
     hash_f = params['hash']
     date = params['date']
+    min_shares = params['min_shares']
 
-    (cypher, hmac, key) = randomness_galore(will_txt, cripto_f, hash_f, date)
-    
-    helper_service.insert_will(jwt_token['username'], cypher)
+    (cypher, hmac, key, pub, sign, nonce) = randomness_galore(will_txt, cripto_f, hash_f, date)
+
+    helper_service.insert_will(jwt_token['username'], 
+        cypher, hmac, sign, pub, nonce, min_shares, username_list)
 
     db_auth.close()
     return jsonify({"message": "End"})
