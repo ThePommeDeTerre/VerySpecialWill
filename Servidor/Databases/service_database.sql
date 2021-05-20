@@ -22,7 +22,9 @@ DROP TABLE IF EXISTS share_key;
 
 CREATE TABLE share_key(
     key_id INT(10) NOT NULL AUTO_INCREMENT,
-    value_of_key VARCHAR(150) NOT NULL,
+    value_of_key_x VARCHAR(150) NOT NULL,
+    value_of_key_y VARCHAR(150) NOT NULL,
+    active TINYINT DEFAULT 0,
     PRIMARY KEY (key_id)
 );
 

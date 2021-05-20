@@ -45,7 +45,7 @@ class OurAES:
         else:
             self.__mode = AES.MODE_CBC
 
-    def encrypt(self, pt, key, iv, **kwargs) -> bytes:
+    def encrypt(self, pt, key, iv = None, **kwargs) -> bytes:
         """Encrypt a stream of bytes using current AES configuration.
         
         Parameters
@@ -65,12 +65,18 @@ class OurAES:
         # TODO : try catch
         # TODO : Different encryption modes may require more or less argumentsD
         # Pad message and encrypt it. Result is given in bytes
+        if isinstance(pt,int):
+            pt = str(pt).encode()
         if isinstance(key,str):
             key = key.encode()
         if isinstance(iv,str):
             iv = iv.encode()
 
-        cifra = AES.new(key, self.__mode, iv)
+        if self.__mode == AES.MODE_ECB:
+            cifra = AES.new(key, self.__mode)
+        else:
+            cifra = AES.new(key, self.__mode, iv)
+
         bytes_ct = cifra.encrypt(pad(pt, AES.block_size))
         # Kwarg routines
         if 'show' in kwargs.keys() and kwargs['show']:
@@ -118,7 +124,11 @@ class OurAES:
         if isinstance(iv,str):
             iv = iv.encode()
 
-        cifra = AES.new(key, self.__mode, iv)
+        if self.__mode == AES.MODE_ECB:
+            cifra = AES.new(key, self.__mode)
+        else:
+            cifra = AES.new(key, self.__mode, iv)
+
         pt = unpad(cifra.decrypt(ct), AES.block_size).decode('utf-8')
 
         if 'show' in kwargs.keys() and kwargs['show']:

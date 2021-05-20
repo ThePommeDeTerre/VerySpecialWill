@@ -56,7 +56,7 @@ def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type:
     htype = int(hash_type)
 
     # the last 16 bytes of the hash of the date are part of the key
-    key = key[:16] + nonce[-16:]
+    key = key[:16] + date_hash[-16:]
 
     # Treat cipher and encryption type
     if 0 < ctype <= 3:
@@ -102,7 +102,7 @@ def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type:
     signature = b64encode(signature).decode('utf-8')
     nonce = b64encode(nonce).decode('utf-8')
 
-    return bytes_ct, hmac, key, public, signature, nonce
+    return bytes_ct, hmac, key[0:16], public, signature, nonce,date_hash
 
 
 def share_secrets(min_shares: int, shares: int, key: bytes) -> List[Tuple[int, bytes]]:

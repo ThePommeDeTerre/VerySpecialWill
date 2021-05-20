@@ -10,6 +10,9 @@ from mysql.connector import MySQLConnection, Error
 from configparser import ConfigParser
 from mysql.connector import cursor
 
+from helpers.OurShamir import OurShamir
+from helpers.OurAES import OurAES as AesHelper
+
 from mysql.connector.cursor import CursorBase
 
 import auth_db_helper as helper_auth
@@ -133,19 +136,20 @@ class DBHelper_service:
             print(e)
             return False
 
-    def insert_will(self, username, will_ct, will_hmac, will_sign, will_pub,min_shares):
+    def insert_will(self, username, will_ct, will_hmac, will_sign, will_pub, min_shares):
         try:
-            cursor = self.dbConnection.cursor(prepared = True)
+            cursor = self.dbConnection.cursor(prepared=True)
             query = "INSERT INTO will (will_message, will_hmac, will_sign, will_pub, user_owner, n_min_shares) " \
                     "VALUES (%s, %s, %s, %s, %s, %s)"
-            
-            args = (will_ct, will_hmac, will_sign,will_pub,username, min_shares)
-            
+
+            args = (will_ct, will_hmac, will_sign,
+                    will_pub, username, min_shares)
+
             cursor.execute(query, args)
             id_will = cursor.lastrowid
 
             cursor.close()
-            return True
+            return id_will
 
         except Error as e:
             print(e)
@@ -158,6 +162,31 @@ class DBHelper_service:
             query = "INSERT INTO user_share (username_share, key_id_share, will_id_share)"
 
             cursor.commit()
+            cursor.close()
+            return True
+        except Error as e:
+            print(e)
+            return False
+
+    def insert_users_of_will(self, will_id, key, username_list, min_shares, n_shares, date_hash):
+        try:
+            secrets = OurShamir.split_secret(min_shares, n_shares, key)
+            secrets_key = date_hash[-32:-16]
+
+            aes_worker = AesHelper('ECB')
+
+            for i, username in enumerate(username_list):
+                secret_x = aes_worker.encrypt(secrets[i][0], secrets_key)
+                secret_y = aes_worker.encrypt(secrets[i][1], secrets_key)
+
+                cursor = self.dbConnection.cursor(prepared=True)
+                query = "INSERT INTO share_key (value_of_key_x, value_of_key_y) Values (%s,%s)"
+                cursor.execute(query, (secret_x, secret_y))
+                key_id = cursor.lastrowid
+
+                query = "INSERT INTO user_share (username_share, key_id_share, will_id_share) Values (%s,%s,%s)"
+                cursor.execute(query, (username, key_id,will_id))
+
             cursor.close()
             return True
         except Error as e:
