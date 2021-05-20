@@ -6,6 +6,7 @@ from Crypto.Random import get_random_bytes
 from typing import Tuple, List, Union
 from Crypto.Hash import SHA256
 from helpers.OurGenKey import OurGenKey as RSA
+from base64 import b64encode, b64decode
 
 
 
@@ -95,6 +96,11 @@ def randomness_galore(plaintext: Union[bytes, str], crypto_type: str, hash_type:
     public = RSA.extract_public(pair)
 
     signature = RSA.sign_will(pair, plaintext)
+
+    bytes_ct = b64encode(bytes_ct).decode('utf-8')
+    public = b64encode(public).decode('utf-8')
+    signature = b64encode(signature).decode('utf-8')
+    nonce = b64encode(nonce).decode('utf-8')
 
     return bytes_ct, hmac, key, public, signature, nonce
 

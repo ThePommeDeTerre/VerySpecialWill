@@ -36,7 +36,6 @@ CREATE TABLE will (
     will_hmac VARCHAR(256) NOT NULL,
     will_sign VARCHAR(256) NOT NULL,
     will_pub TEXT NOT NULL,
-    will_nonce VARCHAR(256),
     user_owner VARCHAR(50) NOT NULL,
     n_min_shares INT(10) NOT NULL,
     PRIMARY KEY (will_id),

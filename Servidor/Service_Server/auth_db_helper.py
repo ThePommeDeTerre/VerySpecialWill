@@ -201,3 +201,9 @@ class DBHelper_auth:
             self.dbConnection.commit()
         except Error as e:
             print(e)
+
+    def rollback(self):
+        try:
+            self.dbConnection.rollback()
+        except Error as e:
+            print(e)
