@@ -67,10 +67,11 @@ def create_will():
         date = params['date']
         min_shares = params['min_shares']
         n_shares = params['n_shares']
+        print(date)
 
         (cypher, hmac, key, pub, sign, nonce,date_hash) = randomness_galore(will_txt, cripto_f, hash_f, date)
         # Insere o testamento
-        will_id = db_service.insert_will(jwt_data['user'], cypher, hmac, sign, pub, min_shares)
+        will_id = db_service.insert_will(jwt_data['user'], cypher, hmac, sign, pub, min_shares,cripto_f,hash_f)
 
         # Insere os segredos do testamento
         db_service.insert_users_of_will(will_id, key, username_list, min_shares, n_shares, date_hash)

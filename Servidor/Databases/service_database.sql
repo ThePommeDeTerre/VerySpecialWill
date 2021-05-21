@@ -40,9 +40,11 @@ CREATE TABLE will (
     will_pub TEXT NOT NULL,
     user_owner VARCHAR(50) NOT NULL,
     n_min_shares INT(10) NOT NULL,
+    cypher_id  INT(10) NOT NULL,
+    hash_id  INT(10) NOT NULL,
     PRIMARY KEY (will_id),
     FOREIGN KEY (user_owner)
-        REFERENCES service_user (service_username)
+    REFERENCES service_user (service_username)
 );
 
 

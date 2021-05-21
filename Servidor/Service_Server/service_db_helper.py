@@ -137,14 +137,13 @@ class DBHelper_service:
             print(e)
             return False
 
-    def insert_will(self, username, will_ct, will_hmac, will_sign, will_pub, min_shares):
+    def insert_will(self, username, will_ct, will_hmac, will_sign, will_pub, min_shares,cripto_f,hash_f):
         try:
             cursor = self.dbConnection.cursor(prepared=True)
-            query = "INSERT INTO will (will_message, will_hmac, will_sign, will_pub, user_owner, n_min_shares) " \
-                    "VALUES (%s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO will (will_message, will_hmac, will_sign, will_pub, user_owner, n_min_shares,cypher_id,hash_id) " \
+                    "VALUES (%s, %s, %s, %s, %s, %s,%s,%s)"
 
-            args = (will_ct, will_hmac, will_sign,
-                    will_pub, username, min_shares)
+            args = (will_ct, will_hmac, will_sign,will_pub, username, min_shares,cripto_f,hash_f)
 
             cursor.execute(query, args)
             id_will = cursor.lastrowid
