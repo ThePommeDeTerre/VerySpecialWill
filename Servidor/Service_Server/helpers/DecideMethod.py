@@ -159,7 +159,7 @@ def decrypt_will(will_message, will_hmac, will_sign,will_pub, cypher_id, hash_id
     elif ctype == 4:
         # the first 24 are used as the nonce
         oCHACHA = OurChaCha()
-        str_pt = oCHACHA.encrypt(will_message, key_total, nonce)
+        str_pt = oCHACHA.decrypt(will_message, key_total, nonce)
 
     # Treat hash type
     if 1 < htype <= 3:
@@ -169,7 +169,9 @@ def decrypt_will(will_message, will_hmac, will_sign,will_pub, cypher_id, hash_id
     elif htype == 1:
         oHMAC = HMAC('MD5', key_total)
     
-    valid = oHMAC.verify_hmac(will_hmac,str_pt)
-    valid = valid and RSA.verify_will(will_pub,str_pt,will_sign)
+    if not oHMAC.verify_hmac(will_hmac,str_pt):
+        return 'Não foi possivel verificar , possivelmente o ficheiro foi adulterado, ou tentaste na data errada', False
+    if not RSA.verify_will(will_pub,str_pt,will_sign):
+        return 'Não foi possivel verificar , possivelmente o ficheiro foi adulterado, ou tentaste na data errada', False
 
-    return str_pt,valid
+    return str_pt, True

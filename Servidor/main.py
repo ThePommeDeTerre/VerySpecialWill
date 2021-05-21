@@ -7,8 +7,8 @@ Main Server file
 from flask import Flask, render_template, redirect
 
 app = Flask(__name__)
-#ip = '149.90.108.93'
-ip = 'localhost'
+ip = '149.90.108.93'
+#ip = 'localhost'
 
 
 @app.route('/auth/', defaults={'allowed_paths': None})

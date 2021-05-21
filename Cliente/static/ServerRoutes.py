@@ -1,5 +1,5 @@
-# IP = "149.90.108.93"
-IP = "localhost"
+IP = "149.90.108.93"
+# IP = "localhost"
 PORT = "5000"
 
 SERVER = "http://" + IP + ":" + PORT + "/"

@@ -54,7 +54,6 @@
                     <select name="confidential_level" id="input-confidential_level" class="form-select"
                             placeholder="Confidential Level" required>
                         <option value="1">Secrets kept by server</option>
-                        <option value="2">Secrets sent to users</option>
                     </select>
                     
                     {#Allowed Date#}
@@ -62,10 +61,6 @@
                     <input id="input-allowed_date" name="allowed_date" type="date" class="form-input"
                            placeholder="Allowed Date" required>
 
-                    {#Minimum Shares Needed#}
-                    <label class="form-label" for="input-minimum_shares">Minimum Shares Needed</label>
-                    <input id="input-minimum_shares" name="minimum_shares" type="number" class="form-input"
-                           placeholder="Minimum Shares Needed" required>
                 </div>
             </div>
 
@@ -78,6 +73,11 @@
                         <option value="2">SHA256</option>
                         <option value="3">SHA512</option>
                 </select>
+
+                {#Minimum Shares Needed#}
+                <label class="form-label" for="input-minimum_shares">Minimum Shares Needed</label>
+                <input id="input-minimum_shares" name="minimum_shares" type="number" class="form-input"
+                       placeholder="Minimum Shares Needed" required>
             </div>
         </div>
 

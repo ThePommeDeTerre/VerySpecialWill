@@ -308,10 +308,12 @@ def willview():
                     dead_man_params = response_params['dea_man_will_info']
                     dead_man_params = Common.sanitize_rows(dead_man_params)
                     if response_params['valid']:
-                        flash('Parabéns, ganhou o descrito em baixo', 'success')
-
-                    return render_template('willview.html', dead_man_params=dead_man_params,
-                                           text=response_params['text'])
+                        flash('Congratulations , you won the Will, you are now a proud owner of the message bellow', 'success')
+                        text = response_params['text']
+                    else:
+                        flash(response_params['text'], 'error')
+                        text = ''
+                    return render_template('willview.html', dead_man_params=dead_man_params, text=text)
                 else:
                     return redirect('/inheritedwills')
             elif response_params['status'] == 'OK_ACCESS':
