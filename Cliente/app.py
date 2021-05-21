@@ -163,6 +163,7 @@ def login_2fa():
                 flash(response_params['message'], "danger")
                 return redirect('/')
             elif response_params['status'] == 'NOK_TOKEN':
+                flash('Token Expired', 'danger')
                 return redirect('/cancel_2fa')
             else:
                 return redirect('/')
@@ -220,10 +221,11 @@ def createwill():
             # Tratamento da resposta
             response_params = response.json()
             if response_params['status'] == 'OK':
-                return Common.create_response_message(200, True, response_params['message'])
+                return Common.create_response_message(200, True)
             elif response_params['status'] == 'NOK':
                 return Common.create_response_message(200, False, response_params['message'])
             elif response_params['status'] == 'NOK_TOKEN':
+                flash('Token Expired', 'danger')
                 return redirect('/cancel_2fa')
             else:
                 return Common.create_response_message(200, False, 'Ocorreu um erro')
@@ -240,20 +242,32 @@ def inheritedwills():
         if request.method == 'POST':
             teste = 1
         else:
-            params = []
+            params = {}
             params['jwt_token'] = session['user']['jwt_token']
-            url = SerRoutes.ROUTES['createwill']
+            url = SerRoutes.ROUTES['inheritwill']
             response = requests.post(url, json=params)
 
-            # will id, owner username, active (ver se existe pelo menos um active) , quantas pessoas ativara/quantas sao precisas, timeout
-            wills_list = [[1, '<script>alert("ola")</script>', 1, '10/20', '5:00'],
-                          [2, 'Sou Eu', 1, '5/10', '5:00'],
-                          [3, 'Maria Dos Xutos e Pontapés', 1, '15/20', '4:00'],
-                          [4, 'Cristina Ferreira', 1, '200/20000', '3:00'],
-                          ]
-            wills_list = Common.sanitize_rows(wills_list)
+            # Caso a resposta nao seja ok
+            if response.status_code != 200:
+                raise Exception()
 
-            return render_template('inheritedwills.html', wills_list=wills_list)
+            # Tratamento da resposta
+            response_params = response.json()
+
+            if response_params['status'] == 'OK':
+                wills_list = response_params['rows']
+                wills_list = Common.sanitize_rows(wills_list)
+                return render_template('inheritedwills.html', wills_list=wills_list)
+            elif response_params['status'] == 'NOK_TOKEN':
+                flash('Token Expired', 'danger')
+                return redirect('/cancel_2fa')
+
+            # will id, owner username, active (ver se existe pelo menos um active) , quantas pessoas ativara/quantas sao precisas, timeout
+            #wills_list = [[1, '<script>alert("ola")</script>', 1, '10/20', '5:00'],
+            #              [2, 'Sou Eu', 1, '5/10', '5:00'],
+            #              [3, 'Maria Dos Xutos e Pontapés', 1, '15/20', '4:00'],
+            #              [4, 'Cristina Ferreira', 1, '200/20000', '3:00'],
+            #              ]
     # Caso haja erros de status ou conexão
     except Exception as e:
         return Common.create_response_message(200, False, 'Ocorreu um erro')
@@ -265,8 +279,8 @@ def before_request():
     request_guest_handpoints = ['login', 'registo', 'qrcode', 'main', 'sendemail', 'static']
 
     # for testing
-    #request_guest_handpoints.append('createwill')
-    #request_guest_handpoints.append('inheritedwills')
+    # request_guest_handpoints.append('createwill')
+    # request_guest_handpoints.append('inheritedwills')
 
     if 'user' in session:
         g.user = session['user']

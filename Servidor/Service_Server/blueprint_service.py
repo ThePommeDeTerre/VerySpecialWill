@@ -24,6 +24,7 @@ from helpers.DecideMethod import randomness_galore
 
 service_blueprint = Blueprint('service', __name__,)
 
+
 @service_blueprint.route("/create", methods=["POST"])
 def create_will():
     try:
@@ -49,7 +50,7 @@ def create_will():
 
         if not username_list:
             message = {"status": "NOK",
-                    "message": "One or more emails don\'t exist"}
+                       "message": "One or more emails don\'t exist"}
             return jsonify(message)
 
         db_service = helper_service.DBHelper_service()
@@ -67,20 +68,19 @@ def create_will():
         min_shares = params['min_shares']
         n_shares = params['n_shares']
 
-        # (cypher, hmac, key, pub, sign, nonce,date_hash) = randomness_galore(will_txt, cripto_f, hash_f, date)
-        #Insere o testamento
-        will_id = db_service.insert_will(jwt_data['user'],cypher, hmac, sign, pub, min_shares)
+        (cypher, hmac, key, pub, sign, nonce,date_hash) = randomness_galore(will_txt, cripto_f, hash_f, date)
+        # Insere o testamento
+        will_id = db_service.insert_will(jwt_data['user'], cypher, hmac, sign, pub, min_shares)
 
-        #Insere os segredos do testamento
-        db_service.insert_users_of_will(will_id,key,username_list,min_shares,n_shares,date_hash)
-
+        # Insere os segredos do testamento
+        db_service.insert_users_of_will(will_id, key, username_list, min_shares, n_shares, date_hash)
 
         db_service.commit()
         db_auth.commit()
 
         db_auth.close()
         db_service.close()
-        return jsonify({"status":"OK"})
+        return jsonify({"status": "OK"})
     except Exception as e:
         print(traceback.format_exc())
         if db_auth:
@@ -89,8 +89,8 @@ def create_will():
             db_service.rollback()
         return jsonify({"status": "NOK", "message": "An error has occurred"})
 
-       
-@service_blueprint.route("/inheritpage", methods=["GET"])
+
+@service_blueprint.route("/inheritpage", methods=["POST"])
 def inherit_will_fill_page():
     """
     Method to try and inherit a will
@@ -109,12 +109,12 @@ def inherit_will_fill_page():
 
     username = jwt_data['user']
     db_service = helper_service.DBHelper_service()
-    
+
     # Buscar as wills que estão associadas ao perfil do utilizador
     # Eventually add timeout
     will_params = db_service.populate_page_with_wills(username)
 
-    return jsonify(will_params)
+    return jsonify({'status': 'OK', 'rows': will_params})
 
 
 def get_from_json(JSONKey):

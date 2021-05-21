@@ -181,8 +181,6 @@ class DBHelper_service:
                 secret_y = aes_worker.encrypt(secrets[i][1], secrets_key)
                 secret_x = b64encode(secret_x).decode('utf-8')
                 secret_y = b64encode(secret_y).decode('utf-8')
-                print(secret_x)
-                print(secret_y)
 
                 cursor = self.dbConnection.cursor(prepared=True)
                 query = "INSERT INTO share_key (value_of_key_x, value_of_key_y) Values (%s,%s)"
@@ -190,7 +188,7 @@ class DBHelper_service:
                 key_id = cursor.lastrowid
 
                 query = "INSERT INTO user_share (username_share, key_id_share, will_id_share) Values (%s,%s,%s)"
-                cursor.execute(query, (username, key_id,will_id))
+                cursor.execute(query, (username, key_id, will_id))
 
             cursor.close()
             return True
@@ -201,16 +199,20 @@ class DBHelper_service:
     def populate_page_with_wills(self, username):
         try:
             cursor = self.dbConnection.cursor(prepared=True)
-            query = "SELECT will_id, n_min_shares, user_owner FROM will INNER JOIN user_share WHERE will_id_share = will_id AND username_share = (%s)"
+            query = "SELECT w.will_id, w.n_min_shares, w.user_owner, s.active FROM will w "
+            query += "INNER JOIN user_share u ON u.will_id_share = w.will_id "
+            query += "INNER JOIN share_key s ON u.key_id_share = s.key_id "
+            query += "WHERE username_share = (%s)"
             cursor.execute(query, (username,))
 
             # Iterate over every select that has (will_id, n_min_shares, user_owner)
             content = []
             for row in self.iter_row(cursor, 10):
-                (a,) = row
-                if not a:
+                if not row:
                     break
-                content.append(a)
+                will_id, n_min_shares, user_owner, active = row
+
+                content.append([will_id, user_owner, active, n_min_shares])
 
             cursor.close()
             return content

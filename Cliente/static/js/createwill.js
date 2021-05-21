@@ -109,6 +109,7 @@ const IndexHelper = function () {
                 success: (data, status) => {
                     // Retira o disabled
                     element.attr('disabled', false)
+                    debugger;
                     if (!data.success)
                         handleAjaxError(data)
                     else
