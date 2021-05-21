@@ -12,6 +12,10 @@ class OurShamir:
     split_secret() -> List[bytes]
     combine() -> bytes
     """
+    
+    @classmethod
+    def simple_combine(cls, shares) -> bytes:
+        return Shamir.combine(shares)
 
     @classmethod
     def split_secret(cls, min_shares: int, n: int, key: bytes) -> List[Tuple[int, bytes]]:

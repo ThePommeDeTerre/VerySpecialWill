@@ -98,7 +98,7 @@ class OurAES:
 
         return bytes_ct
 
-    def decrypt(self, ct, key, iv, **kwargs) -> str:
+    def decrypt(self, ct, key, iv = None, **kwargs) -> str:
         """Decrypt a stream of bytes using current AES configuration.
         
         Parameters
@@ -128,7 +128,6 @@ class OurAES:
             cifra = AES.new(key, self.__mode)
         else:
             cifra = AES.new(key, self.__mode, iv)
-
         pt = unpad(cifra.decrypt(ct), AES.block_size).decode('utf-8')
 
         if 'show' in kwargs.keys() and kwargs['show']:

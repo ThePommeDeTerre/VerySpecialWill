@@ -21,6 +21,7 @@ import auth_db_helper as helper_auth
 import service_db_helper as helper_service
 import pyotp
 from helpers.DecideMethod import randomness_galore
+from datetime import datetime
 
 service_blueprint = Blueprint('service', __name__,)
 
@@ -173,10 +174,23 @@ def decypher_will():
 
         #verifica se já estao todas as chaves reunidas
         will_ready = db_service.is_will_ready(username,will_id)
-
+        
         if not will_ready:
             db_service.commit()
             raise Exception('Not all shares are ready, try later')
+
+        #vai buscar a data em que o dead man quer partilhar a fortuna
+        current_date = (datetime.date(datetime.now())).strftime("%Y-%m-%d")
+
+        #vai buscar os segredos dos afortunados
+        secrets = db_service.decifer_secrets(current_date,will_id)
+
+        text , valid = db_service.decifer_will(secrets,current_date,will_id)
+        dead_man_will_info , has_access  = db_service.has_access_to_will(username,will_id)
+
+        db_service.commit()
+        db_service.close()
+        return jsonify({'status': 'OK', 'access': has_access , 'dea_man_will_info': dead_man_will_info,'text':text,'valid':valid})
 
     except Exception as e:
         print(traceback.format_exc())

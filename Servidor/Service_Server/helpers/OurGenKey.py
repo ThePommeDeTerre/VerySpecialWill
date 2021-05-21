@@ -26,6 +26,9 @@ class OurGenKey:
         if isinstance(publickey, bytes):
             publickey = RSA.importKey(publickey)
 
+        if isinstance(plaintext, str):
+            plaintext = plaintext.encode()
+
         oHASH = SHA256.new(plaintext)
         try:
             pkcs1_15.new(publickey).verify(oHASH, signature)

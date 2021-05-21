@@ -303,12 +303,23 @@ def willview():
 
             # Tratamento da resposta
             response_params = response.json()
-            if response_params['status'] == 'OK_ACCESS':
+            if response_params['status'] == 'OK':
+                if response_params['access']:
+                    dead_man_params = response_params['dea_man_will_info']
+                    dead_man_params = Common.sanitize_rows(dead_man_params)
+                    if response_params['valid']:
+                        flash('Parabéns, ganhou o descrito em baixo', 'success')
+
+                    return render_template('willview.html', dead_man_params=dead_man_params,
+                                           text=response_params['text'])
+                else:
+                    return redirect('/inheritedwills')
+            elif response_params['status'] == 'OK_ACCESS':
                 if response_params['access']:
                     dead_man_params = response_params['dea_man_will_info']
                     dead_man_params = Common.sanitize_rows(dead_man_params)
                     flash(response_params['message'], 'danger')
-                    return render_template('willview.html', dead_man_params=dead_man_params)
+                    return render_template('willview.html', dead_man_params=dead_man_params, text='')
                 else:
                     return redirect('/inheritedwills')
             elif response_params['status'] == 'NOK_TOKEN':

@@ -51,7 +51,6 @@ def encrypt_2fa(token, username):
 def decrypt_2fa(cypher, username):
     aes = OurAES.OurAES('CBC')
     h, h2 = get_2fa_necessities(username)
-    print(b64decode(cypher))
     decypher = aes.decrypt(b64decode(cypher), h[-32:], h2[0:16])
     return decypher
     

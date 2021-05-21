@@ -81,17 +81,22 @@ class OurHMAC:
             Plaintext in bytes whose integrity needs verification
         """
         try:
+            if isinstance(pt, str):
+                pt = pt.encode()
+
             # Initialize HMAC object, give it the plaintext
             # Give it the plaintext
             h = HMAC.new(self.__key, digestmod=self.__mode)
             h.update(pt)
+
 
             # Verify Current HMAC with a given HMAC
             h.hexverify(hmac)
             print('VERIFIED OK\n')
             return True
 
-        except Exception:
+        except Exception as e:
+            print(e)
             print('VERIFIED FAILURE')
             return False
 

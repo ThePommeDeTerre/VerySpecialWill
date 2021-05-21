@@ -14,10 +14,12 @@ from helpers.OurShamir import OurShamir
 from helpers.OurAES import OurAES as AesHelper
 
 from mysql.connector.cursor import CursorBase
+from Crypto.Hash import SHA256
 
 import auth_db_helper as helper_auth
-from base64 import b64encode
+from base64 import b64encode,b64decode
 
+from helpers.DecideMethod import decrypt_will
 
 class DBHelper_service:
     dbConnection = None
@@ -177,9 +179,9 @@ class DBHelper_service:
 
             for i, username in enumerate(username_list):
                 secret_x = aes_worker.encrypt(secrets[i][0], secrets_key)
-                secret_y = aes_worker.encrypt(secrets[i][1], secrets_key)
-                secret_x = b64encode(secret_x).decode('utf-8')
-                secret_y = b64encode(secret_y).decode('utf-8')
+                secret_x = b64encode(secret_x).decode()
+                secret_y = b64encode(secrets[i][1]).decode()
+                
 
                 cursor = self.dbConnection.cursor(prepared=True)
                 query = "INSERT INTO share_key (value_of_key_x, value_of_key_y) Values (%s,%s)"
@@ -271,7 +273,7 @@ class DBHelper_service:
             cursor = self.dbConnection.cursor(prepared=True)
             query = "SELECT n_min_shares from will WHERE will_id = %s "
             cursor.execute(query, (will_id,))
-            n_min_shares = cursor.fetchone()
+            n_min_shares = cursor.fetchone()[0]
             cursor.close()
 
             cursor = self.dbConnection.cursor(prepared=True)
@@ -281,12 +283,54 @@ class DBHelper_service:
             cursor.execute(query, (will_id,))
             n_shares = cursor.fetchone()[0]
             cursor.close()
-
-            return n_min_shares > n_shares
+            return int(n_min_shares) <= int(n_shares)
         except Exception as e:
             print(e)
             return False
 
+    def decifer_secrets(self,current_date,will_id):
+        try:
+            #vai buscar as shares dadas como active
+            cursor = self.dbConnection.cursor(prepared=True)
+            query =  "SELECT value_of_key_x, value_of_key_y from share_key "
+            query += "Inner Join user_share ON key_id = key_id_share "
+            query += "WHERE will_id_share = (%s) AND active = 1 "
+            cursor.execute(query, (will_id,))
+            shares = cursor.fetchall()
+
+            #cria o hash da data para ser usado como chave
+            date_hash = SHA256.new(current_date.encode()).digest()
+            key = date_hash[-32:-16]
+            aes_worker = AesHelper('ECB')
+            secrets = []
+            for share in shares:
+                decyphered_x = aes_worker.decrypt(b64decode(share[0]),key)
+                decyphered_y = b64decode(share[1])
+                secrets.append((int(decyphered_x),decyphered_y))
+                
+            return secrets
+
+                
+        except Exception as e:
+            print(e)
+            return False
+
+    def decifer_will(self,secrets,current_date,will_id):
+        try:
+            #vai buscar as shares dadas como active
+            cursor = self.dbConnection.cursor(prepared=True)
+            query =  "SELECT will_message, will_hmac, will_sign, will_pub, cypher_id, hash_id from will "
+            query += "WHERE will_id = (%s) "
+            cursor.execute(query, (will_id,))
+
+            will_message,will_hmac,will_sign,will_pub,cypher_id,hash_id = cursor.fetchone()
+
+            decripted,valid = decrypt_will(will_message, will_hmac, will_sign,will_pub, cypher_id, hash_id,current_date,secrets)
+
+            return decripted,valid            
+        except Exception as e:
+            print(e)
+            return 'Ocorreu um erro',False
     #endregion
 
     def commit(self):
