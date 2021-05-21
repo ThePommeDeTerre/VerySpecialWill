@@ -9,5 +9,6 @@ ROUTES = {
     'login_2fa': SERVER + "auth/login2fa",
     'createwill': SERVER + "service/create",
     'inheritwill': SERVER + "service/inheritpage",
-    'hasaccesstowill': SERVER + "service/hasaccesstowill"
+    'hasaccesstowill': SERVER + "service/hasaccesstowill",
+    'decypherwill': SERVER + "service/decypherwill",
 }

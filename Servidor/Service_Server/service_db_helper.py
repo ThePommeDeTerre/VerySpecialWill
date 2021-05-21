@@ -233,14 +233,61 @@ class DBHelper_service:
                 query = "SELECT user_owner, n_min_shares from will WHERE will_id = %s "
                 cursor.execute(query, (will_id,))
                 user, n_min_shares = cursor.fetchone()
+                
+                cursor = self.dbConnection.cursor(prepared=True)
+                query = "SELECT Count(*) from user_share "
+                query += "Inner Join share_key ON key_id = key_id_share "
+                query += "WHERE will_id_share = %s AND active = 1 "
+                cursor.execute(query, (will_id,))
+                n_shares = cursor.fetchone()[0]
+
                 cursor.close()
-                return [user, n_min_shares], True
+                return [user, n_min_shares,n_shares], True
             else:
                 return None, False
 
         except Exception as e:
             print(e)
             return None, False
+    
+    #region decypher_will
+
+    def update_your_share(self, username, will_id):
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+            query = "UPDATE share_key s "
+            query += "Inner join user_share us on us.key_id_share = s.key_id "
+            query += "set s.active = 1 "
+            query += "where us.username_share = (%s) and us.will_id_share= (%s)  "
+            cursor.execute(query, (username,will_id,))
+            cursor.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+    
+    def is_will_ready(self, username, will_id):
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+            query = "SELECT n_min_shares from will WHERE will_id = %s "
+            cursor.execute(query, (will_id,))
+            n_min_shares = cursor.fetchone()
+            cursor.close()
+
+            cursor = self.dbConnection.cursor(prepared=True)
+            query = "SELECT Count(*) from user_share "
+            query += "Inner Join share_key ON key_id = key_id_share "
+            query += "WHERE will_id_share = %s AND active = 1 "
+            cursor.execute(query, (will_id,))
+            n_shares = cursor.fetchone()[0]
+            cursor.close()
+
+            return n_min_shares > n_shares
+        except Exception as e:
+            print(e)
+            return False
+
+    #endregion
 
     def commit(self):
         try:

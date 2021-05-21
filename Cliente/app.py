@@ -290,7 +290,32 @@ def willview():
                 flash('Token Expired', 'danger')
                 return redirect('/cancel_2fa')
         elif request.method == 'POST':
-            return 1
+            params = {}
+            params['will_id'] = escape(request.args.get('id'))
+            params['jwt_token'] = session['user']['jwt_token']
+
+            url = SerRoutes.ROUTES['decypherwill']
+            response = requests.post(url, json=params)
+
+            # Caso a resposta nao seja ok
+            if response.status_code != 200:
+                raise Exception()
+
+            # Tratamento da resposta
+            response_params = response.json()
+            if response_params['status'] == 'OK_ACCESS':
+                if response_params['access']:
+                    dead_man_params = response_params['dea_man_will_info']
+                    dead_man_params = Common.sanitize_rows(dead_man_params)
+                    flash(response_params['message'], 'danger')
+                    return render_template('willview.html', dead_man_params=dead_man_params)
+                else:
+                    return redirect('/inheritedwills')
+            elif response_params['status'] == 'NOK_TOKEN':
+                flash('Token Expired', 'danger')
+                return redirect('/cancel_2fa')
+            else:
+                return redirect('/inheritedwills')
 
     # Caso haja erros de status ou conexão
     except Exception as e:

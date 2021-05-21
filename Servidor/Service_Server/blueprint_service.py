@@ -139,9 +139,55 @@ def has_access_to_will():
 
     db_service = helper_service.DBHelper_service()
 
-    dea_man_will_info , has_access  = db_service.has_access_to_will(username,will_id)
+    dead_man_will_info , has_access  = db_service.has_access_to_will(username,will_id)
 
-    return jsonify({'status': 'OK', 'access': has_access , 'dea_man_will_info': dea_man_will_info})
+    return jsonify({'status': 'OK', 'access': has_access , 'dea_man_will_info': dead_man_will_info})
+    
+
+@service_blueprint.route("/decypherwill", methods=["POST"])
+def decypher_will():
+    db_service = helper_service.DBHelper_service()
+
+    # get jwt token
+    jwt_token = get_from_json("jwt_token")
+    will_id = get_from_json("will_id")
+    try:
+        """
+        Method to try and inherit a will
+        """
+
+        # verifica se o jwt é valido
+        jwt_data, jwt_valid = is_jwt_valid(jwt_token)
+
+        # caso não seja retorna uma mensagem de erro
+        if not jwt_valid:
+            return jwt_data
+        del jwt_valid
+
+        username = jwt_data['user']
+
+        #faz update ao teu key_share
+        if not db_service.update_your_share(username,will_id):
+            db_service.commit()
+            raise Exception('An error has occurred in the share update')
+
+        #verifica se já estao todas as chaves reunidas
+        will_ready = db_service.is_will_ready(username,will_id)
+
+        if not will_ready:
+            db_service.commit()
+            raise Exception('Not all shares are ready, try later')
+
+    except Exception as e:
+        print(traceback.format_exc())
+
+        #dados para refazer o ecrã
+        dead_man_will_info , has_access  = db_service.has_access_to_will(username,will_id)
+
+        if db_service:
+            db_service.close()
+        return jsonify({'status': 'OK_ACCESS', 'access': has_access , 'dea_man_will_info': dead_man_will_info, 'message':str(e)})
+    
 
 
 def get_from_json(JSONKey):
