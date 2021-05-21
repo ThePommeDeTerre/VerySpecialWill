@@ -24,63 +24,6 @@ from helpers.DecideMethod import randomness_galore
 
 service_blueprint = Blueprint('service', __name__,)
 
-# must be here to avoid circular imports
-
-
-@service_blueprint.route("/login2fa", methods=["POST"])
-def login_user2fa():
-    """
-    Method to verify 2fa after login
-
-    :param: 2fa_token,code
-    :return: jwt, status, 2fa token and username if the credentials are valid
-             401 if the credentials are invalid
-    """
-
-    # get parameters
-    jwt_token = get_from_json("jwt_token")
-    secret_token = get_from_json("secret")
-    fa_code = get_from_json("otp")
-
-    # verifica se o jwt é valido
-    jwt_data, jwt_valid = is_jwt_valid(jwt_token)
-
-    # caso não seja retorna uma mensagem de erro
-    if not jwt_valid:
-        return jwt_data
-    del jwt_valid
-
-    db_auth = helper_auth.DBHelper_auth()
-    fa_token = db_auth.user_has_2fa(jwt_data['user'])
-
-    if not bool(fa_token):
-        totp = pyotp.TOTP(secret_token)
-
-        if not totp.verify(fa_code):
-            return jsonify({"status": "NOK", "message": "Wrong 2FA code"})
-
-        crypt = encrypt_2fa(secret_token, jwt_data['user'])
-
-        result = db_auth.insert_user_info_for_2fa(crypt, jwt_data['user'])
-
-        db_auth.commit()
-        db_auth.close()
-
-        if result:
-            return jsonify({"status": "OK"})
-        else:
-            return jsonify({"status": "NOK", "message": "You are contacting support"})
-
-    else:
-        secret_token = decrypt_2fa(fa_token, jwt_data['user'])
-        totp = pyotp.TOTP(secret_token)
-
-        if not totp.verify(fa_code):
-            return jsonify({"status": "NOK", "message": "Wrong 2FA code"})
-        else:
-            return jsonify({"status": "OK"})
-
-
 @service_blueprint.route("/create", methods=["POST"])
 def create_will():
     try:
@@ -124,8 +67,7 @@ def create_will():
         min_shares = params['min_shares']
         n_shares = params['n_shares']
 
-
-        (cypher, hmac, key, pub, sign, nonce,date_hash) = randomness_galore(will_txt, cripto_f, hash_f, date)
+        # (cypher, hmac, key, pub, sign, nonce,date_hash) = randomness_galore(will_txt, cripto_f, hash_f, date)
         #Insere o testamento
         will_id = db_service.insert_will(jwt_data['user'],cypher, hmac, sign, pub, min_shares)
 
@@ -146,6 +88,33 @@ def create_will():
         if db_service:
             db_service.rollback()
         return jsonify({"status": "NOK", "message": "An error has occurred"})
+
+       
+@service_blueprint.route("/inheritpage", methods=["GET"])
+def inherit_will_fill_page():
+    """
+    Method to try and inherit a will
+    """
+
+    # get jwt token
+    jwt_token = get_from_json("jwt_token")
+
+    # verifica se o jwt é valido
+    jwt_data, jwt_valid = is_jwt_valid(jwt_token)
+
+    # caso não seja retorna uma mensagem de erro
+    if not jwt_valid:
+        return jwt_data
+    del jwt_valid
+
+    username = jwt_data['user']
+    db_service = helper_service.DBHelper_service()
+    
+    # Buscar as wills que estão associadas ao perfil do utilizador
+    # Eventually add timeout
+    will_params = db_service.populate_page_with_wills(username)
+
+    return jsonify(will_params)
 
 
 def get_from_json(JSONKey):

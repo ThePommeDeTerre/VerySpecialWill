@@ -154,7 +154,7 @@ class DBHelper_service:
 
         except Error as e:
             print(e)
-            return False
+            return -1
 
     def insert_usershare(self):
         try:
@@ -197,6 +197,27 @@ class DBHelper_service:
         except Error as e:
             print(e)
             return False
+
+    def populate_page_with_wills(self, username):
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+            query = "SELECT will_id, n_min_shares, user_owner FROM will INNER JOIN user_share WHERE will_id_share = will_id AND username_share = (%s)"
+            cursor.execute(query, (username,))
+
+            # Iterate over every select that has (will_id, n_min_shares, user_owner)
+            content = []
+            for row in self.iter_row(cursor, 10):
+                (a,) = row
+                if not a:
+                    break
+                content.append(a)
+
+            cursor.close()
+            return content
+
+        except Exception as e:
+            print(e)
+            return []
 
     def commit(self):
         try:
