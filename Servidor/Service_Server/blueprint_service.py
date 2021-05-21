@@ -117,6 +117,32 @@ def inherit_will_fill_page():
     return jsonify({'status': 'OK', 'rows': will_params})
 
 
+@service_blueprint.route("/hasaccesstowill", methods=["POST"])
+def has_access_to_will():
+    """
+    Method to try and inherit a will
+    """
+    # get jwt token
+    will_id = get_from_json("will_id")
+    jwt_token = get_from_json("jwt_token")
+
+    # verifica se o jwt é valido
+    jwt_data, jwt_valid = is_jwt_valid(jwt_token)
+
+    # caso não seja retorna uma mensagem de erro
+    if not jwt_valid:
+        return jwt_data
+    del jwt_valid
+
+    username = jwt_data['user']
+
+    db_service = helper_service.DBHelper_service()
+
+    dea_man_will_info , has_access  = db_service.has_access_to_will(username,will_id)
+
+    return jsonify({'status': 'OK', 'access': has_access , 'dea_man_will_info': dea_man_will_info})
+
+
 def get_from_json(JSONKey):
     """
     Get the parameter from json

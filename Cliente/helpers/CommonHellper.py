@@ -24,6 +24,8 @@ def sanitize_rows(params):
     for p, param in enumerate(params):
         if isinstance(param, str):
             params[p] = escape(param.rstrip())
+        elif isinstance(param, int):
+            params[p] = param
     return params
 
 

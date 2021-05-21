@@ -1,0 +1,35 @@
+{% extends 'layout/main.html' %}
+
+
+{% block title %}
+    Will
+{% endblock %}
+
+{% block content %}
+    <div class="columns">
+        <div class="column col-12">
+            <h5>
+                THIS PERSON, {{ dead_man_params[0] }} ,PROBABLY DIED, BUT YOU CAN HAVE WHAT THEY WANTED TO GIVE YOU ;)
+                <br>
+                YOU AND AT LEAST , {{ dead_man_params[1] }} ,OTHERS MUST GIVE YOUR SECRETS TO GET THE
+                <strong>WILL</strong> <br>
+                {{ dead_man_params[1] }} / {{ dead_man_params[1] }} HAVE GIVEN THE POWER TO GET THE
+                <strong>WILL</strong> <br>
+                IF YOU GET ALL THE SECRETS IN THE WRONG DAY, YOU WILL GET NO <strong>WILL</strong> <br>
+            </h5>
+
+        </div>
+    </div>
+
+    <div class="columns">
+        <div class="column col-12 text-center">
+            <button type="button" id="btn-decypher">Get The Will</button>
+        </div>
+    </div>
+
+    <div class="columns mr-2">
+        <div class="column col-12">
+            <textarea readonly class="form-input" id="will-text" rows="10"></textarea>
+        </div>
+    </div>
+{% endblock %}

@@ -239,12 +239,38 @@ def createwill():
 @app.route('/inheritedwills', methods=['POST', 'GET'])
 def inheritedwills():
     try:
-        if request.method == 'POST':
-            teste = 1
-        else:
+        params = {}
+        params['jwt_token'] = session['user']['jwt_token']
+        url = SerRoutes.ROUTES['inheritwill']
+        response = requests.post(url, json=params)
+
+        # Caso a resposta nao seja ok
+        if response.status_code != 200:
+            raise Exception()
+
+        # Tratamento da resposta
+        response_params = response.json()
+
+        if response_params['status'] == 'OK':
+            wills_list = response_params['rows']
+            wills_list = Common.sanitize_rows(wills_list)
+            return render_template('inheritedwills.html', wills_list=wills_list)
+        elif response_params['status'] == 'NOK_TOKEN':
+            flash('Token Expired', 'danger')
+            return redirect('/cancel_2fa')
+    # Caso haja erros de status ou conexão
+    except Exception as e:
+        return Common.create_response_message(200, False, 'Ocorreu um erro')
+
+
+@app.route('/willview', methods=['POST', 'GET'])
+def willview():
+    try:
+        if request.method == 'GET':
             params = {}
+            params['will_id'] = escape(request.args.get('id'))
             params['jwt_token'] = session['user']['jwt_token']
-            url = SerRoutes.ROUTES['inheritwill']
+            url = SerRoutes.ROUTES['hasaccesstowill']
             response = requests.post(url, json=params)
 
             # Caso a resposta nao seja ok
@@ -253,21 +279,19 @@ def inheritedwills():
 
             # Tratamento da resposta
             response_params = response.json()
-
             if response_params['status'] == 'OK':
-                wills_list = response_params['rows']
-                wills_list = Common.sanitize_rows(wills_list)
-                return render_template('inheritedwills.html', wills_list=wills_list)
+                if response_params['access']:
+                    dead_man_params = response_params['dea_man_will_info']
+                    dead_man_params = Common.sanitize_rows(dead_man_params)
+                    return render_template('willview.html', dead_man_params=dead_man_params)
+                else:
+                    return redirect('/inheritedwills')
             elif response_params['status'] == 'NOK_TOKEN':
                 flash('Token Expired', 'danger')
                 return redirect('/cancel_2fa')
+        elif request.method == 'POST':
+            return 1
 
-            # will id, owner username, active (ver se existe pelo menos um active) , quantas pessoas ativara/quantas sao precisas, timeout
-            #wills_list = [[1, '<script>alert("ola")</script>', 1, '10/20', '5:00'],
-            #              [2, 'Sou Eu', 1, '5/10', '5:00'],
-            #              [3, 'Maria Dos Xutos e Pontapés', 1, '15/20', '4:00'],
-            #              [4, 'Cristina Ferreira', 1, '200/20000', '3:00'],
-            #              ]
     # Caso haja erros de status ou conexão
     except Exception as e:
         return Common.create_response_message(200, False, 'Ocorreu um erro')

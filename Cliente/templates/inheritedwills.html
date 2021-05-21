@@ -11,10 +11,9 @@
             <table id="users-table" class="table table-striped">
                 <thead>
                 <tr>
-                    <th width="20%">Owner</th>
+                    <th width="40%">Owner</th>
                     <th width="20%">Active</th>
                     <th width="20%">Secrets</th>
-                    <th width="20%">Timeout</th>
                     <th width="20%">Actions</th>
                 </tr>
                 </thead>
@@ -22,9 +21,8 @@
                 {% for will in wills_list %}
                     <td>{{ will[1] }}</td>
                     <td>{{ will[2] }}</td>
-                    <td>{{ will[3] }}</td>
                     <td>{{ will[4] }}</td>
-                    <td><a href="createwill" type="button" class="btn btn-primary" data-value="{{ will[0] }}">Join Will</a></td>
+                    <td><a href="willview?id={{ will[0] }}" type="button" class="btn btn-primary" >Join Will</a></td>
                 </tr>
 
                 {% endfor %}

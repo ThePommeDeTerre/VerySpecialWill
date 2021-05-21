@@ -221,6 +221,28 @@ class DBHelper_service:
             print(e)
             return []
 
+    def has_access_to_will(self, username, will_id):
+        try:
+            cursor = self.dbConnection.cursor(prepared=True)
+            query = "Select Count(*) from user_share "
+            query += "WHERE will_id_share = %s AND username_share = %s "
+            cursor.execute(query, (will_id, username,))
+            count = cursor.fetchone()
+            cursor.close()
+            if count[0] == 1:
+                cursor = self.dbConnection.cursor(prepared=True)
+                query = "SELECT user_owner, n_min_shares from will WHERE will_id = %s "
+                cursor.execute(query, (will_id,))
+                user, n_min_shares = cursor.fetchone()
+                cursor.close()
+                return [user, n_min_shares], True
+            else:
+                return None, False
+
+        except Exception as e:
+            print(e)
+            return None, False
+
     def commit(self):
         try:
             self.dbConnection.commit()
