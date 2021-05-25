@@ -382,6 +382,7 @@ def handle_csrf_error(e):
 
 if __name__ == '__main__':
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    app.run(ssl_context=(dir_path + '/cert.pem', dir_path + '/key.pem'), port='32182')
+    # app.run(ssl_context=(dir_path + '/cert.pem', dir_path + '/key.pem'), port='32182')
+    pp.run(port='32182')
 
 # response = requests.get("http://149.90.108.93:80")
